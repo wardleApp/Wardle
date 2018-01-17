@@ -4,19 +4,13 @@ import { Link } from 'react-router-dom';
 import Avatar from 'material-ui/Avatar';
 import Paper from 'material-ui/Paper';
 import Dialog from 'material-ui/Dialog';
-import axios from 'axios';
 
 class FeedContainer extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      open: false,
-      history: ''
+      open: false
     };
-    axios('/feed/all', {params: {userId: this.props.userId}})
-      .then((results) =>{
-        this.setState({history: JSON.stringify(results.data.items)});
-      });
   }
 
   handleOpen () {
@@ -65,7 +59,7 @@ class FeedContainer extends React.Component {
             onRequestClose={this.handleClose.bind(this)}
             autoScrollBodyContent={true}
           >
-            {this.state.history}
+            {this.props.history}
           </Dialog>
         </div>
         {feedComponent}

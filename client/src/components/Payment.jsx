@@ -79,7 +79,8 @@ class Payment extends React.Component {
       amount: this.state.amount,
       note: this.state.note,
       private: this.state.private,
-      request_pending: +this.state.amount < 0
+      request: +this.state.amount < 0,
+      pending: +this.state.amount < 0
     };
     axios.post('/pay', payment)
       .then((response) => {

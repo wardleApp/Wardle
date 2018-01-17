@@ -7,7 +7,8 @@ const pay = function(paymentDataFromServer) {
   // amount: '-10',
   // note: 'zcxvadf',
   // private: 'false',
-  // request_pending: 'true' }
+  // request: 'true',
+  // pending: 'true'}
 
   let localPaymentInfo = {
     payerBalance: undefined,
@@ -33,7 +34,7 @@ const pay = function(paymentDataFromServer) {
       })
       // add to the transactions table with txn_id
       .then(txn_id => {
-        if (paymentDataFromServer.request_pending) {
+        if (paymentDataFromServer.request === 'true') {
           return addTransaction(paymentTransaction, txn_id, paymentDataFromServer);
         } else {
           return Promise.all([
@@ -96,7 +97,8 @@ const addTransaction = function(paymentTransaction, txn_id, paymentDataFromServe
     amount: parseFloat(paymentDataFromServer.amount).toFixed(2),
     note: paymentDataFromServer.note,
     private: paymentDataFromServer.private,
-    request: paymentDataFromServer.request_pending
+    request: paymentDataFromServer.request,
+    pending: paymentDataFromServer.pending
   })
 }
 

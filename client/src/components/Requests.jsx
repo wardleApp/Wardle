@@ -6,6 +6,7 @@ import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
 import axios from 'axios';
 
+<<<<<<< 79670a83d72a2954af53bf9a2371545c88a1963e
 class Requests extends React.Component {
   constructor (props) {
     super(props);
@@ -13,6 +14,52 @@ class Requests extends React.Component {
       open: false
     }
   }
+=======
+const Requests = (props) => {
+  console.log(props.request);
+  return props.request.payee.userId === props.userId ? (
+    <div className='feed-container'>
+      <ListItem disabled={true}
+        leftAvatar={<Avatar src={'/images/no-image.gif'} />}
+        primaryText={
+          <span>
+            <span className='feed-item-user'><Link to={`/${props.request.payer.username}`}>{props.request.payer.fullName}</Link></span> has sent you a payment request {'(private)'}
+            <p className='feed-item-note'>{props.request.note}</p>
+          </span>
+        }
+        rightAvatar={
+          <div className='feed-item-amount showDebit'>
+            {props.request.amount}
+          </div>
+        }
+        secondaryText={
+         <div className='feed-item-timestamp'>{props.request.timestamp}</div>
+        }
+        secondaryTextLines={1}
+      />
+
+    </div>
+  ) : (
+    <div className='feed-container'>
+      <ListItem disabled={true}
+        leftAvatar={<Avatar src={'/images/no-image.gif'} />}
+        primaryText={
+          <span>
+            <span className='feed-item-user'>You have sent <Link to={`/${props.request.payee.username}`}>{props.request.payee.fullName}</Link></span> a payment request {'(private)'}
+            <p className='feed-item-note'>{props.request.note}</p>
+          </span>
+        }
+        rightAvatar={
+          <div className='feed-item-amount'>
+            {props.request.amount.replace('--', '')}
+          </div>
+        }
+        secondaryText={
+         <div className='feed-item-timestamp'>{props.request.timestamp}</div>
+        }
+        secondaryTextLines={1}
+      />
+>>>>>>> request modules
 
   handleAccept() {
     let payment = {

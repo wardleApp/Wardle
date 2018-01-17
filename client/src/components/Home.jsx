@@ -4,10 +4,18 @@ import Payment from './Payment.jsx';
 import FeedContainer from './FeedContainer.jsx';
 import MiniProfile from './MiniProfile.jsx';
 import Requests from './Requests.jsx';
+import axios from 'axios';
 
 class Home extends React.Component {
   constructor (props) {
     super(props);
+    this.state = {
+      history: []
+    }
+    axios('/feed/all', {params: {userId: this.props.userInfo.userId}})
+      .then((results) =>{
+        this.setState({history: results.data.items});
+      });
   }
 
   extractView() {
@@ -51,14 +59,16 @@ class Home extends React.Component {
               feeds={orderedFeeds}
               loadMoreFeed={this.props.loadMoreFeed}
               view={this.extractView()}
+              history={JSON.stringify(this.state.history)}
             />
           </div>
           <div className="home-rightColumn">
             <MiniProfile
               balance={this.props.balance}
               userInfo={this.props.userInfo}/>
-            <Requests/>
-            {console.log(this.props)}
+            {this.state.history.filter(transaction => transaction.request).map((transaction, index) =>
+              <Requests key={index} request={transaction} userId={this.props.userInfo.userId}/>
+            )}
           </div>
         </div>
       </div>

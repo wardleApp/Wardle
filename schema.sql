@@ -28,7 +28,8 @@ CREATE TABLE TRANSACTIONS (
   amount NUMERIC(10,2),
   note VARCHAR(1000),
   private BOOLEAN NOT NULL DEFAULT false,
-  request_pending BOOLEAN NOT NULL DEFAULT false,
+  request BOOLEAN NOT NULL DEFAULT false,
+  pending BOOLEAN NOT NULL DEFAULT false,
   created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
