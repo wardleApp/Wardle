@@ -6,6 +6,44 @@ const helpers = require('./helpers.js');
 var path = require('path');
 const _ = require('underscore');
 
+//for sending emails
+const sgMail = require('@sendgrid/mail');
+
+//==================================//
+//======= EMAIL INVITATION =========//
+//==================================//
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+var router = express.Router();
+
+router.get("/invite", function(req, res) {
+
+  let token = "guava0001";
+  let link = "https://wardle.herokuapp.com/signup";
+
+  let sender = "Jackie Jou";
+  let recipient = "Nuno Neves";
+
+  let subject = "Wardle welcomes you.";
+  let text = `Greetings, ${recipient}. \n ${sender} has invited you to the future of peer payment. \n \n Sign up on ${link} and use the following token to give your friend a Jackson: \n ${token} \n\n With Love, \n Wardle`;
+
+  const msg = {
+    to: 'youknownuno@example.com',
+    from: 'joujackie@example.com',
+    subject: subject,
+    text: text,
+    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+  };
+
+  sgMail.send(msg);
+});
+
+// test this on:
+// https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
+
+//==================================//
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
