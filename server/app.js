@@ -6,6 +6,43 @@ const helpers = require('./helpers.js');
 var path = require('path');
 const _ = require('underscore');
 
+//for sending emails
+const sendgrid = require('sendgrid')(api_user, api_key);
+
+
+//==================================//
+//======= EMAIL INVITATION =========//
+//==================================//
+
+var router = express.Router();
+
+router.get("/invite", function(req, res) {
+
+  let token = "guava0001";
+  let link = "https://wardle.herokuapp.com/signup";
+
+  let sender = "Jackie Jou";
+  let recipient = "Nuno Neves";
+
+  let subject = "Wardle welcomes you.";
+  let text = `Greetings, ${recipient}. \n ${sender} has invited you to the future of peer payment. \n \n Sign up on ${link} and use the following token to give your friend a Jackson: \n ${token} \n\n With Love, \n Wardle`;
+
+  sendgrid.send({
+  to: process.env.EMAIL,
+  from: 'joujackie@gmail.com',
+  subject: subject,
+  text: text
+  },function(err, json){
+    if (err) {
+      return res.send("error sending email");
+        }
+    console.log("message object = ", json);
+    res.send("message sent.");
+  });
+});
+
+//==================================//
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
