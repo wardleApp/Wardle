@@ -33,7 +33,8 @@ class App extends React.Component {
       globalFeed: {},
       userFeed: {},
       balance: null,
-      userInfo: {}
+      userInfo: {}, 
+      cookie: {}
     }
   }
 
@@ -135,13 +136,14 @@ class App extends React.Component {
       });
   }
 
-  logUserIn(userId) {
+  logUserIn(userId, cookie) {
     // set the userId in the userInfo object as soon as the user logs in
     var obj = this.state.userInfo;
     obj.userId = userId;
     this.setState({
-      isLoggedIn: true, 
-      userInfo: obj
+      isLoggedIn: true,
+      userInfo: obj, 
+      cookie: cookie
     })
     this.loadUserData(userId);
   }
@@ -154,6 +156,13 @@ class App extends React.Component {
       balance: null,
       userInfo: {}
     })
+    // axios('/logout')
+    // .then((response) => {
+    //   console.log('Logout success');
+    // })
+    // .catch((err) => {
+    //   console.log('Logout unsuccesful');
+    // })
   }
 
   twoFactorAuthToggle() {
@@ -179,6 +188,7 @@ class App extends React.Component {
                 globalFeed={this.state.globalFeed}
                 userInfo={this.state.userInfo}
                 balance={this.state.balance}
+                cookie={this.state.cookie}
                 {...props}
               />
           }
@@ -201,7 +211,11 @@ class App extends React.Component {
                 isLoggedIn={this.state.isLoggedIn} 
                 logUserOut={this.logUserOut.bind(this)}
                 userInfo={this.state.userInfo}
+<<<<<<< HEAD
                 twoFactorAuthToggle={this.twoFactorAuthToggle.bind(this)}
+=======
+                cookie={this.state.cookie}
+>>>>>>> Passing the cookie along to the front end after login
                 {...routeProps} 
               />
           }

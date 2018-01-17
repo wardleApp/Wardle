@@ -13,40 +13,6 @@ const dillonRoutes = require('./dillonRoutes.js');
 //for sending emails
 const sgMail = require('@sendgrid/mail');
 
-//==================================//
-//======= EMAIL INVITATION =========//
-//==================================//
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-var router = express.Router();
-
-router.get("/invite", function(req, res) {
-
-  let token = "guava0001";
-  let link = "https://wardle.herokuapp.com/signup";
-
-  let sender = "Jackie Jou";
-  let recipient = "Nuno Neves";
-
-  let subject = "Wardle welcomes you.";
-  let text = `Greetings, ${recipient}. \n ${sender} has invited you to the future of peer payment. \n \n Sign up on ${link} and use the following token to give your friend a Jackson: \n ${token} \n\n With Love, \n Wardle`;
-
-  const msg = {
-    to: 'youknownuno@example.com',
-    from: 'joujackie@example.com',
-    subject: subject,
-    text: text,
-    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-  };
-
-  sgMail.send(msg);
-});
-
-// test this on:
-// https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
-
-//==================================//
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -69,13 +35,26 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        expires: 300000
+        expires: 300000, 
+        path: '/login'
     }
 }));
 
 
+// This will potentially be used for unique sessions later
+// app.use(session({
+//   genid: function(req) {
+//     return genuuid() // use UUIDs for session IDs
+//   },
+//   secret: 'allthesecrets'
+// }))
+
+
 app.post('/login', (req, res) => {
+  let session = req.session;
+  console.log('session, ' , session);
   var {username, password} = req.body;
+
   db.getPasswordAtUsername(_.escape(username.replace(/"/g,"'")), (err, row) => {
     if (err) {
       console.error("Error retrieving from database: ", err);
@@ -83,16 +62,31 @@ app.post('/login', (req, res) => {
     } else {
       if (row.length) {
         if (bcrypt.compareSync(password, row[0].password)) {
-          res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password});
+          session.userId = row[0].id
+          res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password, sessionId: session});
         } else {
           res.status(401).json({ error : "Incorrect password"});
         }
-      } else{
+      } else {
         res.status(401).json({ error : "Invalid username"});
       }
     }
   });
 });
+
+
+
+// app.get('/logout', (req, res) => {
+//   console.log(req);
+//   req.session.destroy((err) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       console.log('Cookie successfully destroyed')
+//       res.redirect('/');
+//     }
+//   })
+// })
 
 app.get('/usernames', (req, res) => {
   db.getUsernames(parseInt(_.escape(req.query.userId)))
@@ -341,4 +335,43 @@ app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '..' , './client/dist/index.html'));
 });
 
+//==================================//
+//======= EMAIL INVITATION =========//
+//==================================//
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+var router = express.Router();
+
+router.get("/invite", function(req, res) {
+
+  let token = "guava0001";
+  let link = "https://wardle.herokuapp.com/signup";
+
+  let sender = "Jackie Jou";
+  let recipient = "Nuno Neves";
+
+  let subject = "Wardle welcomes you.";
+  let text = `Greetings, ${recipient}. \n ${sender} has invited you to the future of peer payment. \n \n Sign up on ${link} and use the following token to give your friend a Jackson: \n ${token} \n\n With Love, \n Wardle`;
+
+  const msg = {
+    to: 'youknownuno@example.com',
+    from: 'joujackie@example.com',
+    subject: subject,
+    text: text,
+    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+  };
+
+  sgMail.send(msg);
+});
+
+// test this on:
+// https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
+
+//==================================//
+
+
 module.exports = app;
+
+
+

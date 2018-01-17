@@ -60,7 +60,8 @@ class Login extends React.Component {
         })
       } else {
         let userId = response.data.userId;
-        this.props.logUserIn(userId);
+        let cookie = response.data.sessionId;
+        this.props.logUserIn(userId, cookie);
         // <Redirect to="/" push/>
         this.props.history.push('/');
       }
