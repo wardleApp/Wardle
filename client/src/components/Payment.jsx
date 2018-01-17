@@ -5,6 +5,9 @@ import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import AutoComplete from 'material-ui/AutoComplete';
+import Checkbox from 'material-ui/Checkbox';
+import Visibility from 'material-ui/svg-icons/action/visibility';
+import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 
 const style = {
   form: {
@@ -33,7 +36,8 @@ class Payment extends React.Component {
       amount: '',
       note: '',
       paymentFail: false,
-      usernames: []
+      usernames: [],
+      private: false
     }
   }
 
@@ -48,7 +52,7 @@ class Payment extends React.Component {
       console.error(err);
     })
   }
-  
+
   handleInputChanges (event) {
     let target = event.target;
     this.setState({
@@ -62,12 +66,19 @@ class Payment extends React.Component {
     })
   }
 
+  setPrivate () {
+    this.setState({
+      private: !this.state.private
+    }, console.log('privacy is now', !this.state.private))
+  }
+
   payUser() {
     let payment = {
       payerId: this.props.payerId,
       payeeUsername: !this.state.payeeUsername ? this.props.payeeUsername : this.state.payeeUsername,
       amount: this.state.amount,
-      note: this.state.note
+      note: this.state.note,
+      private: this.state.private
     };
     axios.post('/pay', payment)
       .then((response) => {
@@ -75,6 +86,7 @@ class Payment extends React.Component {
           payeeUsername: '',
           amount: '',
           note: '',
+          private: false,
           paymentFail: false
         });
         this.props.refreshUserData(this.props.payerId);
@@ -104,8 +116,8 @@ class Payment extends React.Component {
   render() {
     return (
       <Paper className='payment-container' style={style.form}>
-        <div className='payment-item-container'>         
-            {!this.props.payeeUsername && 
+        <div className='payment-item-container'>
+            {!this.props.payeeUsername &&
               <div className="form-box payment-username">
                 <AutoComplete
                   hintText="Enter a username"
@@ -146,14 +158,22 @@ class Payment extends React.Component {
           <br />
           </div>
         </div>
-
-        <button className='btn' onClick={this.payUser.bind(this)}>Pay</button>
-        {this.state.paymentFail
-          ? <label className='error-text'>
-              Error in payment processing
-            </label>
+        <div>
+          <button className='btn' onClick={this.payUser.bind(this)}>Pay</button>
+          {this.state.paymentFail
+            ? <label className='error-text'>
+            Error in payment processing
+          </label>
           : null
-        }
+          }
+          <Checkbox className='payment-private'
+            checked={this.state.private}
+            checkedIcon={<VisibilityOff />}
+            uncheckedIcon={<Visibility />}
+            onClick={this.setPrivate.bind(this)}
+            label={'Set transaction as '}
+          />
+        </div>
       </Paper>
     );
   }

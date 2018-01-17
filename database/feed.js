@@ -22,6 +22,7 @@ const formatOutput = (item, userId) => {
     amount: amount,
     note: item.note,
     timestamp: formattedDate,
+    private: item.private,
     payer: {
       userId: item.payer_id,
       username: item.payer_username,
@@ -47,7 +48,8 @@ const FEED_FIELDS = ['transactions.txn_id',
   'transactions.note',
   'transactions.amount',
   'transactions.created_at',
-  {payer_id: 'users_transactions.payer_id'}, 
+  'transactions.private',
+  {payer_id: 'users_transactions.payer_id'},
   {payer_firstName: 'payer.first_name'},
   {payer_username: 'payer.username'},
   {payer_lastName: 'payer.last_name'},
@@ -110,7 +112,7 @@ module.exports = {
       .modify(sinceIdQuery, sinceId)
       .limit(limit)
       .then(rows => {
-        return rows.map((item) => formatOutput(item, userId));
+        return rows.filter(item => !item.private).map((item) => formatOutput(item, userId));
      })
   },
 
@@ -130,7 +132,7 @@ module.exports = {
   },
 
   // Return recent transactions involving a single user.
-  // Returns public and private fields. 
+  // Returns public and private fields.
   // GETS transactions filtered by PROFILEID, but FORMATS OUTPUT based on LOGGED-IN USER
   profileFeed: function(limit, beforeId, sinceId, profileUsername, userId) {
     return pg('users_transactions')
@@ -141,11 +143,11 @@ module.exports = {
       .modify(sinceIdQuery, sinceId)
       .limit(limit)
       .then(rows => {
-        return rows.map((item) => formatOutput(item, userId));
+        return rows.filter(item => !item.private).map((item) => formatOutput(item, userId));
       })
   },
 
-  // 
+  //
   profileFeedRelational: function(limit, beforeId, sinceId, profileUsername, userId) {
     return pg('users_transactions')
       .select(...FEED_FIELDS)

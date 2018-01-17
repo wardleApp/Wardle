@@ -81,7 +81,8 @@ const addTransaction = function(paymentTransaction, txn_id, paymentDataFromServe
   .insert({
     txn_id: parseInt(txn_id[0]),
     amount: parseFloat(paymentDataFromServer.amount).toFixed(2),
-    note: paymentDataFromServer.note
+    note: paymentDataFromServer.note,
+    private: paymentDataFromServer.private
   })
 }
 
