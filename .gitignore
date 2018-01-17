@@ -21,6 +21,7 @@ coverage
 # Local attributes
 .DS_Store
 client/.DS_Store
+package-lock.json
 
 # Compiled Dirs (http://nodejs.org/api/addons.html)
 build/

@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const app = express();
 const bodyParser = require('body-parser');
 const db = require('../database/queries.js');
@@ -64,7 +65,7 @@ app.post('/login', (req, res) => {
       res.status(500).json(err);
     } else {
       if (row.length) {
-        if (row[0].password === password) {
+        if (bcrypt.compareSync(password, row[0].password)) {
           res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password});
         } else {
           res.status(401).json({ error : "Incorrect password"});
