@@ -12,6 +12,7 @@ module.exports = {
   payment: payment.pay,
   getUsernames: usernames.getUsernames,
   globalFeed: feed.globalFeed,
+  allFeed: feed.allFeed,
   myFeed: feed.myFeed,
   profileFeed: feed.profileFeed,
   profileFeedRelational: feed.profileFeedRelational

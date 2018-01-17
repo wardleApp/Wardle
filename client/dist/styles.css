@@ -286,6 +286,10 @@ body {
 
 }
 
+.history {
+  float: right;
+}
+
 /* mini profile component*/
 
 .profile-container {

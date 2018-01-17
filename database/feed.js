@@ -160,5 +160,14 @@ module.exports = {
       .then(rows => {
         return rows.map((item) => formatOutput(item, userId));
       })
+  },
+  allFeed: (userId) => {
+    return pg('users_transactions')
+      .select(...FEED_FIELDS)
+      .modify(baseTransactionConnections)
+      .modify(mustIncludeUserById, userId)
+      .then(rows => {
+        return rows.map((item) => formatOutput(item, userId));
+     })
   }
 };

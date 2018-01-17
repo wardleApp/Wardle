@@ -175,7 +175,7 @@ app.get('/publicprofile', (req, res) => {
     .catch((err) => {
       console.error('error retrieving profile data: ', err);
       res.sendStatus(500).json({error: 'server error'});
-    }) 
+    })
 });
 
 // FEED ENDPOINTS
@@ -185,7 +185,7 @@ const FEED_DEFAULT_LENGTH = 5;
 app.get('/feed/global', (req, res) => {
   let limit = FEED_DEFAULT_LENGTH;
   let userId = req.query && parseInt(req.query.userId);
-  let beforeId = parseInt(req.query['beforeId']) || null; 
+  let beforeId = parseInt(req.query['beforeId']) || null;
   let sinceId = parseInt(req.query['sinceId']) || null;
 
   db.globalFeed(limit + 1, beforeId, sinceId, userId)
@@ -199,11 +199,24 @@ app.get('/feed/global', (req, res) => {
     })
 });
 
+app.get('/feed/all', (req, res) => {
+  let userId = parseInt(req.query.userId);
+  db.allFeed(userId)
+    .then((results) => {
+      let unescapedResults = JSON.parse(_.unescape(JSON.stringify(results)));
+      res.status(200).json(helpers.buildFeedObject(unescapedResults, 1000));
+    })
+    .catch((err) => {
+      console.error('error retrieving global feed: ', err);
+      res.sendStatus(500).json({error: 'server error'});
+    })
+});
+
 app.get('/feed/user/:userId', (req, res) => {
   let userId = req.params && parseInt(req.params.userId);
 
   let limit = FEED_DEFAULT_LENGTH;
-  let beforeId = parseInt(req.query['beforeId']) || null; 
+  let beforeId = parseInt(req.query['beforeId']) || null;
   let sinceId = parseInt(req.query['sinceId']) || null;
 
   if (isNaN(userId)) {
@@ -229,7 +242,7 @@ app.get('/feed/profile', (req, res) => {
   profileUsername = profileUsername && _.escape(profileUsername.replace(/"/g,"'"));
 
   let limit = FEED_DEFAULT_LENGTH;
-  let beforeId = parseInt(req.query['beforeId']) || null; 
+  let beforeId = parseInt(req.query['beforeId']) || null;
   let sinceId = parseInt(req.query['sinceId']) || null;
 
   db.profileFeed(limit + 1, beforeId, sinceId, profileUsername, loggedInUserId)
@@ -249,7 +262,7 @@ app.get('/feed/relational', (req, res) => {
   profileUsername = profileUsername && _.escape(profileUsername.replace(/"/g,"'"));
 
   let limit = FEED_DEFAULT_LENGTH;
-  let beforeId = parseInt(req.query['beforeId']) || null; 
+  let beforeId = parseInt(req.query['beforeId']) || null;
   let sinceId = parseInt(req.query['sinceId']) || null;
 
   db.profileFeedRelational(limit + 1, beforeId, sinceId, profileUsername, loggedInUserId)
@@ -268,4 +281,3 @@ app.get('*', (req, res) => {
 });
 
 module.exports = app;
-

@@ -3,17 +3,34 @@ import Feed from './Feed.jsx'
 import { Link } from 'react-router-dom';
 import Avatar from 'material-ui/Avatar';
 import Paper from 'material-ui/Paper';
+import Dialog from 'material-ui/Dialog';
+import axios from 'axios';
 
 class FeedContainer extends React.Component {
   constructor (props) {
     super(props);
+    this.state = {
+      open: false,
+      history: ''
+    };
+    axios('/feed/all', {params: {userId: this.props.userId}})
+      .then((results) =>{
+        this.setState({history: JSON.stringify(results.data.items)});
+      });
   }
 
-  render() {
+  handleOpen () {
+    this.setState({open: true});
+  };
 
+  handleClose () {
+    this.setState({open: false});
+  };
+
+  render() {
     let buttons = [];
     let feedComponent;
-    let viewToDisplay = this.props.view || this.props.feeds[0].urlParam 
+    let viewToDisplay = this.props.view || this.props.feeds[0].urlParam
 
     this.props.feeds.forEach((feed) => {
 
@@ -26,7 +43,7 @@ class FeedContainer extends React.Component {
       );
 
       if (viewToDisplay === feed.urlParam) {
-        feedComponent = <Feed 
+        feedComponent = <Feed
             type={feed.feedType}
             transactions={feed.data}
             userId={this.props.userId}
@@ -38,6 +55,18 @@ class FeedContainer extends React.Component {
       <Paper className='feed-container'>
         <div className='feed-selections'>
           {buttons}
+          <button className='feed-buttons history' onClick={this.handleOpen.bind(this)} >
+            EXPORT
+          </button>
+          <Dialog
+            title="Payment history"
+            modal={false}
+            open={this.state.open}
+            onRequestClose={this.handleClose.bind(this)}
+            autoScrollBodyContent={true}
+          >
+            {this.state.history}
+          </Dialog>
         </div>
         {feedComponent}
       </Paper>
@@ -46,4 +75,3 @@ class FeedContainer extends React.Component {
 }
 
 export default FeedContainer;
-
