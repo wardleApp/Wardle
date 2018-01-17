@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+axios.defaults.withCredentials = true;
 import { Link, Redirect } from 'react-router-dom';
 import NavBar from './Navbar.jsx';
 import TwoFactorAuth from './TwoFactorAuth.jsx';
@@ -60,9 +61,7 @@ class Login extends React.Component {
         })
       } else {
         let userId = response.data.userId;
-        console.log(response.headers);
-        // let cookie = response.data.sess;
-        this.props.logUserIn(userId, null);
+        this.props.logUserIn(userId);
         // <Redirect to="/" push/>
         this.props.history.push('/');
       }

@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bcrypt = require('bcrypt');
 const app = express();
 const bodyParser = require('body-parser');
@@ -13,6 +14,11 @@ const dillonRoutes = require('./dillonRoutes.js');
 //for sending emails
 const sgMail = require('@sendgrid/mail');
 
+// A for allowing cookie sending
+app.use(cors({
+    origin: "localhost:3000",
+    credentials: true
+}))
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -33,26 +39,19 @@ app.use(session({
     key: 'user_sid',
     secret: 'allthesecrets',
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
-        expires: 300000, 
-        path: '/login'
+        expires: 60000, 
+        path: '/login', 
+        secure: false
     }
 }));
 
 
-// This will potentially be used for unique sessions later
-// app.use(session({
-//   genid: function(req) {
-//     return genuuid() // use UUIDs for session IDs
-//   },
-//   secret: 'allthesecrets'
-// }))
 
 
 app.post('/login', (req, res) => {
   let session = req.session;
-  console.log('session, ' , session);
   var {username, password} = req.body;
 
   db.getPasswordAtUsername(_.escape(username.replace(/"/g,"'")), (err, row) => {
@@ -63,8 +62,8 @@ app.post('/login', (req, res) => {
       if (row.length) {
         if (bcrypt.compareSync(password, row[0].password)) {
           session.userId = row[0].id
-          // res.cookie(session.cookie);
-          res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password, sessionId: session});
+          res.cookie('session-cookie', 'loggedIn', { maxAge: 300000 });
+          res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password});
         } else {
           res.status(401).json({ error : "Incorrect password"});
         }
@@ -76,9 +75,8 @@ app.post('/login', (req, res) => {
 });
 
 
-
 // app.get('/logout', (req, res) => {
-//   console.log(req);
+//   console.log(req.cookies);
 //   req.session.destroy((err) => {
 //     if (err) {
 //       console.log(err);
@@ -179,7 +177,10 @@ app.post('/signup', (req, res) => {
 
 app.post('/pay', (req, res) => {
   // TODO: check if user is still logged in (i.e. check cookie) here. If not, send back appropriate error response.
-  console.log(req.session);
+  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+  } 
+
   let paymentData = {};
   for(let key in req.body) {
     paymentData[_.escape(key.replace(/"/g,"'"))] = _.escape(req.body[key].toString().replace(/"/g,"'"));
@@ -191,6 +192,7 @@ app.post('/pay', (req, res) => {
   }
   db.payment(paymentData)
     .then(balance => {
+      res.cookie('session-cookie', 'loggedIn', { maxAge: 300000 });
       res.status(201).json({ balance: balance });
     })
     .catch(err => {

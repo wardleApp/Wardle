@@ -40,7 +40,10 @@ class Home extends React.Component {
           <div className="home-leftColumn pay-feed-container">
             <Payment 
               payerId={this.props.userInfo.userId}
-              refreshUserData={this.props.refreshUserData} />
+              refreshUserData={this.props.refreshUserData}
+              history={this.props.history}
+              logUserOut={this.props.logUserOut}
+              />
             <FeedContainer 
               userId={this.props.userInfo.userId}
               base='/'

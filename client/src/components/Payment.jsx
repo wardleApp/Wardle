@@ -103,6 +103,10 @@ class Payment extends React.Component {
             case 400:
               console.error('BAD REQUEST:', error.response);
               break;
+            case 403:
+              this.props.logUserOut();
+              alert('User has session has timed out.');
+              break;
           }
         } else {
           console.error('Error in payment component:', error);
