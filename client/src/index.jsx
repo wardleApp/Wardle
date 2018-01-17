@@ -37,9 +37,6 @@ class App extends React.Component {
     }
   }
 
-  componentDidMount() {
-  }
-
   loadUserData(userId) {
     this.getUserInfo(userId)
     this.getBalance(userId);
@@ -143,7 +140,7 @@ class App extends React.Component {
     var obj = this.state.userInfo;
     obj.userId = userId;
     this.setState({
-      isLoggedIn: true,
+      isLoggedIn: true, 
       userInfo: obj
     })
     this.loadUserData(userId);
@@ -157,6 +154,10 @@ class App extends React.Component {
       balance: null,
       userInfo: {}
     })
+  }
+
+  twoFactorAuthToggle() {
+    this.setState({twoFactorAuth: !this.state.twoFactorAuth});
   }
 
   render () {
@@ -200,6 +201,7 @@ class App extends React.Component {
                 isLoggedIn={this.state.isLoggedIn} 
                 logUserOut={this.logUserOut.bind(this)}
                 userInfo={this.state.userInfo}
+                twoFactorAuthToggle={this.twoFactorAuthToggle.bind(this)}
                 {...routeProps} 
               />
           }
@@ -217,7 +219,7 @@ class App extends React.Component {
             />
             <Route 
               exact path="/login" 
-              render={routeProps => <Login {...routeProps} logUserIn={this.logUserIn.bind(this)} />} 
+              render={routeProps => <Login {...routeProps} logUserIn={this.logUserIn.bind(this)}/>} 
             />
             <Route 
               path="/:username"

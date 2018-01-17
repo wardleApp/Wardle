@@ -4,12 +4,12 @@ module.exports = {
   getPasswordAtUsername: (username, callback) => {
     pg.table('users')
       .where({username: username})
-      .select('id', 'password')
+      .select('id', 'password', 'twofactor')
       .then((result) => {
         callback(null, result);
       })
       .catch((error) => {
         callback(error, null);
       });
-  } 
+  }
 }

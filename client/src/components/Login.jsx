@@ -2,8 +2,10 @@ import React from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import NavBar from './Navbar.jsx';
+import TwoFactorAuth from './TwoFactorAuth.jsx';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
+
 
 class Login extends React.Component {
   constructor (props) {
@@ -16,7 +18,8 @@ class Login extends React.Component {
       didLoginFail: false,
       errorCode: null,
       errorMessage: '',
-      errorType: ''
+      errorType: '',
+      showTwoFactorAuth: false,
     }
   }
 
@@ -26,32 +29,59 @@ class Login extends React.Component {
     this.setState({ formData });
   }
 
+  compareTwoFactorAuth(hash) {
+    axios.post('/dillon/twoFactorAuthCompare', {
+      hash: hash
+    })
+    .then((results) => {
+      if(results.data) {
+        this.setState({showTwoFactorAuth: false});
+        let userId = results.data;
+        this.props.logUserIn(userId);
+        this.props.history.push('/');
+      }
+    })
+    .catch((error) => {
+      console.log('Error with trying two factor auth', error)
+    })
+  }
+
   logUserIn() {
     let user = this.state.formData;
     axios.post('/login', user)
-      .then((response) => {
+    .then((response) => {
+      if(response.data.twofactor) {
+        axios.post('/dillon/twoFactorAuth', {
+          password: response.data.password,
+          userId: response.data.userId
+        })
+        .then(() => {
+          this.setState({showTwoFactorAuth: true});
+        })
+      } else {
         let userId = response.data.userId;
         this.props.logUserIn(userId);
         this.props.history.push('/');
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 401) {
-          console.log('error authenticating user errors', error.response);
-          var message = error.response.data.error;
-          this.setState({
-            didLoginFail: true,
-            errorCode: 401,
-            errorMessage: message,
-            errorType: message.includes('username') ? 'username' : 'password'
-          })
-        } else {
-          console.log('Error in login component:', error)
-          this.setState({
-            didLoginFail: true,
-            errorCode: 500
-          })   
-        }
-      });
+      }
+    })
+    .catch((error) => {
+      if (error.response && error.response.status === 401) {
+        console.log('error authenticating user errors', error.response);
+        var message = error.response.data.error;
+        this.setState({
+          didLoginFail: true,
+          errorCode: 401,
+          errorMessage: message,
+          errorType: message.includes('username') ? 'username' : 'password'
+        })
+      } else {
+        console.log('Error in login component:', error)
+        this.setState({
+          didLoginFail: true,
+          errorCode: 500
+        })   
+      }
+    });
   }
 
   render() {
@@ -59,27 +89,13 @@ class Login extends React.Component {
     return (
       <div>
         <NavBar isLoggedIn={false} />
-        <div className='body-container'>
+        {this.state.showTwoFactorAuth ? (<div><TwoFactorAuth compareTwoFactorAuth={this.compareTwoFactorAuth.bind(this)}/></div>) : 
+        (<div className='body-container'>
           <div className='form'>
-            <TextField
-              value={formData.username}
-              hintText="Username"
-              errorText={this.state.errorType === 'username' && this.state.errorMessage}
-              floatingLabelText="Username"
-              name='username'
-              onChange = {this.handleInputChanges.bind(this)}
-            />
+            <TextField value={formData.username} hintText="Username" errorText={this.state.errorType === 'username' && this.state.errorMessage} floatingLabelText="Username" name='username' onChange = {this.handleInputChanges.bind(this)}/>
           <br />
           <br/>
-            <TextField
-              value={formData.password}
-              type="password"
-              hintText="Password"
-              errorText={this.state.errorType === 'password' && this.state.errorMessage}
-              floatingLabelText="Password"
-              name='password'
-              onChange = {this.handleInputChanges.bind(this)}
-            />
+            <TextField value={formData.password} type="password" hintText="Password" errorText={this.state.errorType === 'password' && this.state.errorMessage} floatingLabelText="Password" name='password' onChange = {this.handleInputChanges.bind(this)}/>
           <br />
           <br/>
           {this.state.didLoginFail && 
@@ -98,7 +114,7 @@ class Login extends React.Component {
             </Link>
           </div>
         </div>
-          </div>
+          </div>)}
       </div>
     );
   }

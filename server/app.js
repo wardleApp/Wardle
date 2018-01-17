@@ -5,6 +5,7 @@ const db = require('../database/queries.js');
 const helpers = require('./helpers.js');
 var path = require('path');
 const _ = require('underscore');
+const dillonRoutes = require('./dillonRoutes.js');
 
 //for sending emails
 const sgMail = require('@sendgrid/mail');
@@ -52,6 +53,9 @@ app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/../client/dist'));
 
+// DILLON'S ROUTES
+app.use('/dillon', dillonRoutes.router);
+
 app.post('/login', (req, res) => {
   var {username, password} = req.body;
   db.getPasswordAtUsername(_.escape(username.replace(/"/g,"'")), (err, row) => {
@@ -61,7 +65,7 @@ app.post('/login', (req, res) => {
     } else {
       if (row.length) {
         if (row[0].password === password) {
-          res.status(200).json({ userId: row[0].id });
+          res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password});
         } else {
           res.status(401).json({ error : "Incorrect password"});
         }
@@ -137,7 +141,6 @@ app.post('/signup', (req, res) => {
       res.status(400).json({ error: "Improper format." });
       return;
     }
-
   let signupData = {};
   for(let key in req.body) {
     signupData[_.escape(key.replace(/"/g,"'"))] = _.escape(req.body[key].replace(/"/g,"'"));
@@ -203,7 +206,8 @@ app.get('/publicprofile', (req, res) => {
           username: _.unescape(profile.username),
           fullName: _.unescape(profile.first_name + ' ' + profile.last_name),
           createdAt: _.unescape(profile.created_at),
-          avatarUrl: _.unescape(profile.avatar_url)
+          avatarUrl: _.unescape(profile.avatar_url),
+          twofactor: profile.twofactor
         }
         res.status(200).json(userInfo);
       } else {
