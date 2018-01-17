@@ -3,6 +3,7 @@ import Navbar from './Navbar.jsx';
 import Payment from './Payment.jsx';
 import FeedContainer from './FeedContainer.jsx';
 import MiniProfile from './MiniProfile.jsx';
+import Requests from './Requests.jsx';
 
 class Home extends React.Component {
   constructor (props) {
@@ -32,19 +33,19 @@ class Home extends React.Component {
 
     return (
       <div>
-        <Navbar 
-          isLoggedIn={this.props.isLoggedIn} 
+        <Navbar
+          isLoggedIn={this.props.isLoggedIn}
           logUserOut={this.props.logUserOut}
         />
         <div className="home">
           <div className="home-leftColumn pay-feed-container">
-            <Payment 
+            <Payment
               payerId={this.props.userInfo.userId}
               refreshUserData={this.props.refreshUserData}
               history={this.props.history}
               logUserOut={this.props.logUserOut}
               />
-            <FeedContainer 
+            <FeedContainer
               userId={this.props.userInfo.userId}
               base='/'
               feeds={orderedFeeds}
@@ -53,9 +54,11 @@ class Home extends React.Component {
             />
           </div>
           <div className="home-rightColumn">
-            <MiniProfile 
+            <MiniProfile
               balance={this.props.balance}
               userInfo={this.props.userInfo}/>
+            <Requests/>
+            {console.log(this.props)}
           </div>
         </div>
       </div>

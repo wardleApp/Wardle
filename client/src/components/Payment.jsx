@@ -69,7 +69,7 @@ class Payment extends React.Component {
   setPrivate () {
     this.setState({
       private: !this.state.private
-    }, console.log('privacy is now', !this.state.private))
+    })
   }
 
   payUser() {
@@ -78,7 +78,8 @@ class Payment extends React.Component {
       payeeUsername: !this.state.payeeUsername ? this.props.payeeUsername : this.state.payeeUsername,
       amount: this.state.amount,
       note: this.state.note,
-      private: this.state.private
+      private: this.state.private,
+      request_pending: +this.state.amount < 0
     };
     axios.post('/pay', payment)
       .then((response) => {
