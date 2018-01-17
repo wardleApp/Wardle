@@ -18,11 +18,11 @@ module.exports = {
   }, 
 
   // middleware function to check for logged-in users
-  sessionChecker: (req, res, next) => {
-    if (req.session.user && req.cookies.user_sid) {
-        res.redirect('/');
-    } else {
-        next();
-    }    
-  }
+  // sessionChecker: (req, res, next) => {
+  //   if (req.session.user && req.cookies.user_sid) {
+  //       res.redirect('/');
+  //   } else {
+  //       next();
+  //   }    
+  // }
 }

@@ -63,6 +63,7 @@ app.post('/login', (req, res) => {
       if (row.length) {
         if (bcrypt.compareSync(password, row[0].password)) {
           session.userId = row[0].id
+          // res.cookie(session.cookie);
           res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password, sessionId: session});
         } else {
           res.status(401).json({ error : "Incorrect password"});
@@ -178,7 +179,7 @@ app.post('/signup', (req, res) => {
 
 app.post('/pay', (req, res) => {
   // TODO: check if user is still logged in (i.e. check cookie) here. If not, send back appropriate error response.
-  console.log(req.session)
+  console.log(req.session);
   let paymentData = {};
   for(let key in req.body) {
     paymentData[_.escape(key.replace(/"/g,"'"))] = _.escape(req.body[key].toString().replace(/"/g,"'"));
