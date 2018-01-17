@@ -4,6 +4,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const db = require('../database/queries.js');
 const helpers = require('./helpers.js');
+const session = require('express-session');
+const morgan = require('morgan');
 var path = require('path');
 const _ = require('underscore');
 const dillonRoutes = require('./dillonRoutes.js');
@@ -56,6 +58,21 @@ app.use(express.static(__dirname + '/../client/dist'));
 
 // DILLON'S ROUTES
 app.use('/dillon', dillonRoutes.router);
+
+// Turn on dev type logging
+app.use(morgan('dev'));
+
+// initialize express-session to allow us track the logged-in user across sessions.
+app.use(session({
+    key: 'user_sid',
+    secret: 'allthesecrets',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        expires: 300000
+    }
+}));
+
 
 app.post('/login', (req, res) => {
   var {username, password} = req.body;
@@ -167,6 +184,7 @@ app.post('/signup', (req, res) => {
 
 app.post('/pay', (req, res) => {
   // TODO: check if user is still logged in (i.e. check cookie) here. If not, send back appropriate error response.
+  console.log(req.session)
   let paymentData = {};
   for(let key in req.body) {
     paymentData[_.escape(key.replace(/"/g,"'"))] = _.escape(req.body[key].toString().replace(/"/g,"'"));
