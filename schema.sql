@@ -1,4 +1,3 @@
-\connect template1;
 DROP DATABASE IF EXISTS paymo;
 CREATE DATABASE paymo;
 \connect paymo;
@@ -12,6 +11,8 @@ CREATE TABLE USERS (
   created_at timestamp DEFAULT CURRENT_TIMESTAMP,
   phone varchar(11) UNIQUE NOT NULL,
   password varchar(64) NOT NULL,
+  twofactor BOOLEAN DEFAULT FALSE, /* DILLON ADDED */
+  twofactorhash text, /* DILLON ADDED */
   email varchar(64) UNIQUE NOT NULL,
   avatar_url varchar(500)
 );

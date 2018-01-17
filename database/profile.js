@@ -1,4 +1,5 @@
 const pg = require('./index.js').pg;
+const Promise = require('bluebird');
 
 module.exports = {
 
@@ -30,7 +31,22 @@ module.exports = {
   getProfileDataByUsername: (username) => {
     return pg.table('users')
       .where({username: username})
-      .select('id', 'username', 'first_name', 'last_name', 'created_at', 'avatar_url')
+      .select('id', 'username', 'first_name', 'last_name', 'created_at', 'avatar_url', 'twofactor')
       .limit(1)
+  },
+
+  toggleTwoFactorAuth: (username, currentAuth) => {
+    return new Promise((resolve, reject) => {
+      pg.table('users')
+      .where({username: username})
+      .update({'twofactor': currentAuth})
+      .then((result) => {
+        resolve(result);
+      })
+      .catch((error) => {
+        reject(error);
+      })
+    })
   }
+
 };

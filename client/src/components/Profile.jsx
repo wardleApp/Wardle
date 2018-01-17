@@ -138,11 +138,10 @@ class Profile extends React.Component {
           logUserOut={this.props.logUserOut} />
         <div className='body-container'>
           {this.state.unknownUser 
-            ? <div>User does not exist</div>
+            ? <div>User does not exist</div> 
+            : !this.state.profileInfo.twofactor ? <div></div> 
             : <div className='pay-feed-container'>
-              <ProfileHeader 
-                profileInfo={this.state.profileInfo}
-              />
+              <ProfileHeader profileInfo={this.state.profileInfo} twoFactorAuthToggle={this.props.twoFactorAuthToggle}/>
               {this.props.userInfo.username !== this.props.match.params.username
                 ? <Payment
                     refreshUserData={this.props.refreshUserData}
@@ -159,6 +158,7 @@ class Profile extends React.Component {
                 base={this.props.match.params.username}
                 view={this.extractView()}
               />
+
               </div>
           }
         </div>
