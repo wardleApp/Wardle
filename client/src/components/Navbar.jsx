@@ -33,24 +33,24 @@ class Navbar extends React.Component {
 
   render() {
     return (
-      <AppBar 
+      <AppBar
         className='navbar'
         style={style.nav}
         title={
           <div className='navbar-logo'>
-            <Link to="/"><span>Paymo</span></Link>
+            <Link to="/"><span>Wardle</span></Link>
           </div>
         }
         iconStyleLeft={style.left}
         iconElementRight={
           <div>
-            {this.props.isLoggedIn && 
-              <FlatButton 
+            {this.props.isLoggedIn &&
+              <FlatButton
                 style={style.log_out}
                 hoverColor='#03A9F4'
-                className='navbar-logout' 
-                onClick={this.logOutAndRedirect.bind(this)} 
-                label="Log Out" 
+                className='navbar-logout'
+                onClick={this.logOutAndRedirect.bind(this)}
+                label="Log Out"
               />
             }
           </div>

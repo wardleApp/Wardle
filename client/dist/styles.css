@@ -67,7 +67,7 @@ body {
 
 /*
  * -----------------
- * STRUCTURAL PAGE STYLING 
+ * STRUCTURAL PAGE STYLING
  * -----------------
 */
 
@@ -124,11 +124,11 @@ body {
 
 
 /* -----------------
- * COMPONENT STYLING 
+ * COMPONENT STYLING
  * -----------------
 */
 
-/* nav bar component */ 
+/* nav bar component */
 
 .navbar {
   background: #3D95CE;
@@ -196,6 +196,11 @@ body {
   align-content: center;
 }
 
+.payment-private {
+  max-width: 200px;
+  direction: rtl;
+  float:right;
+}
 /* feed component */
 
 .feed-container {
