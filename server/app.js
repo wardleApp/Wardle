@@ -48,8 +48,6 @@ app.use(session({
 }));
 
 
-
-
 app.post('/login', (req, res) => {
   let session = req.session;
   var {username, password} = req.body;
@@ -62,7 +60,7 @@ app.post('/login', (req, res) => {
       if (row.length) {
         if (bcrypt.compareSync(password, row[0].password)) {
           session.userId = row[0].id
-          res.cookie('session-cookie', 'loggedIn', { maxAge: 300000 });
+          res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
           res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password});
         } else {
           res.status(401).json({ error : "Incorrect password"});
@@ -75,17 +73,10 @@ app.post('/login', (req, res) => {
 });
 
 
-// app.get('/logout', (req, res) => {
-//   console.log(req.cookies);
-//   req.session.destroy((err) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       console.log('Cookie successfully destroyed')
-//       res.redirect('/');
-//     }
-//   })
-// })
+app.get('/logout', (req, res) => {
+  console.log('Cookie destroyed');
+  res.clearCookie("session-cookie").send(200);
+})
 
 app.get('/usernames', (req, res) => {
   db.getUsernames(parseInt(_.escape(req.query.userId)))
@@ -102,6 +93,14 @@ app.get('/usernames', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
+  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  } 
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   var userId = req.query.userId;
   db.profile.getUserInfo(parseInt(_.escape(userId.replace(/"/g,"'"))), (err, row) => {
     if (err) {
@@ -126,6 +125,7 @@ app.get('/profile', (req, res) => {
 });
 
 app.get('/balance', (req, res) => {
+
   var userId = req.query.userId;
   db.profile.getBalance(parseInt(_.escape(userId.replace(/"/g,"'"))), (err, row) => {
     if (err) {
@@ -158,6 +158,9 @@ app.post('/signup', (req, res) => {
   }
   db.signup.newUserSignup(signupData, 100)
     .then(userId => {
+
+      // Initiate inital cookie on successful sign up
+      res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
       res.status(201).json({ userId: userId });
     })
     .catch(err => {
@@ -179,7 +182,11 @@ app.post('/pay', (req, res) => {
   // TODO: check if user is still logged in (i.e. check cookie) here. If not, send back appropriate error response.
   if (req.headers.cookie !== 'session-cookie=loggedIn') {
     res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
   } 
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
 
   let paymentData = {};
   for(let key in req.body) {
@@ -192,7 +199,6 @@ app.post('/pay', (req, res) => {
   }
   db.payment(paymentData)
     .then(balance => {
-      res.cookie('session-cookie', 'loggedIn', { maxAge: 300000 });
       res.status(201).json({ balance: balance });
     })
     .catch(err => {
@@ -209,6 +215,15 @@ app.post('/pay', (req, res) => {
 
 
 app.get('/publicprofile', (req, res) => {
+  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  } 
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
+
   let username = req.query.username;
   username = username && _.escape(username.replace(/"/g,"'"));
 
@@ -241,6 +256,14 @@ app.get('/publicprofile', (req, res) => {
 const FEED_DEFAULT_LENGTH = 5;
 
 app.get('/feed/global', (req, res) => {
+  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  } 
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let limit = FEED_DEFAULT_LENGTH;
   let userId = req.query && parseInt(req.query.userId);
   let beforeId = parseInt(req.query['beforeId']) || null;
@@ -258,6 +281,14 @@ app.get('/feed/global', (req, res) => {
 });
 
 app.get('/feed/all', (req, res) => {
+  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  } 
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let userId = parseInt(req.query.userId);
   db.allFeed(userId)
     .then((results) => {
@@ -271,12 +302,19 @@ app.get('/feed/all', (req, res) => {
 });
 
 app.get('/feed/user/:userId', (req, res) => {
+  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  } 
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let userId = req.params && parseInt(req.params.userId);
 
   let limit = FEED_DEFAULT_LENGTH;
   let beforeId = parseInt(req.query['beforeId']) || null;
   let sinceId = parseInt(req.query['sinceId']) || null;
-
   if (isNaN(userId)) {
     res.sendStatus(400).json({ error: "Improper format." });
     return;
@@ -294,6 +332,14 @@ app.get('/feed/user/:userId', (req, res) => {
 });
 
 app.get('/feed/profile', (req, res) => {
+  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  } 
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let profileUsername = req.query.profileUsername;
   let loggedInUserId = req.query && parseInt(req.query.userId);
 
@@ -315,10 +361,17 @@ app.get('/feed/profile', (req, res) => {
 });
 
 app.get('/feed/relational', (req, res) => {
+  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  } 
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let profileUsername = req.query.profileUsername;
   let loggedInUserId = req.query && parseInt(req.query.userId);
   profileUsername = profileUsername && _.escape(profileUsername.replace(/"/g,"'"));
-
   let limit = FEED_DEFAULT_LENGTH;
   let beforeId = parseInt(req.query['beforeId']) || null;
   let sinceId = parseInt(req.query['sinceId']) || null;
