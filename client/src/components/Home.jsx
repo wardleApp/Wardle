@@ -67,9 +67,12 @@ class Home extends React.Component {
             />
           </div>
           <div className="home-rightColumn">
-            <MiniProfile
-              balance={this.props.balance}
-              userInfo={this.props.userInfo}/>
+            <MiniProfile 
+            refreshUserData={this.props.refreshUserData}
+            balance={this.props.balance} 
+            userInfo={this.props.userInfo} 
+            socket={this.props.socket}
+            />
             {this.state.history.filter(transaction => transaction.pending).map((transaction, index) =>
               <Requests key={index} request={transaction} userId={this.props.userInfo.userId} refreshUserData={this.props.refreshUserData} getHistory={this.getHistory.bind(this)}/>
             )}

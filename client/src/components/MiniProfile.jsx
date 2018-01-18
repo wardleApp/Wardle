@@ -3,6 +3,7 @@ import Avatar from 'material-ui/Avatar';
 import Divider from 'material-ui/Divider';
 import Paper from 'material-ui/Paper';
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import LiveLoan from './LiveLoan.jsx';
 
 const style = {
   card: {
@@ -54,6 +55,7 @@ class MiniProfile extends React.Component {
           <CardText style={style.balance}>
             <strong>${this.props.balance}</strong>
           </CardText>
+          <LiveLoan socket={this.props.socket} userInfo={this.props.userInfo} refreshUserData={this.props.refreshUserData}/>
         </Card>
       </Paper>
     );

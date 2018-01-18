@@ -149,7 +149,7 @@ class Profile extends React.Component {
             ? <div>User does not exist</div>
             /*: !this.state.profileInfo.twofactor ? <div></div> */
             : <div className='pay-feed-container'>
-              <ProfileHeader profileInfo={this.state.profileInfo} twoFactorAuthToggle={this.props.twoFactorAuthToggle}/>
+              <ProfileHeader profileInfo={this.state.profileInfo} twoFactorAuthToggle={this.props.twoFactorAuthToggle} loadProfileData={this.loadProfileData.bind(this)}/>
               {this.props.userInfo.username !== this.props.match.params.username
                 ? <Payment
                     refreshUserData={this.props.refreshUserData}

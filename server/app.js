@@ -9,13 +9,17 @@ const session = require('express-session');
 const morgan = require('morgan');
 var path = require('path');
 const _ = require('underscore');
+
+/* Dillon Experimental Routes */
 const dillonRoutes = require('./dillonRoutes.js');
+const index = require('./index.js');
+/* Dillon Experimental Routes */
 
 //for sending emails
 const sgMail = require('@sendgrid/mail');
 
 // A for allowing cookie sending
-app.use(cors({
+app.use(cors({ 
     origin: "localhost:3000",
     credentials: true
 }))
@@ -75,7 +79,7 @@ app.post('/login', (req, res) => {
 
 app.get('/logout', (req, res) => {
   console.log('Cookie destroyed');
-  res.clearCookie("session-cookie").send(200);
+  res.clearCookie("session-cookie").sendStatus(200);
 })
 
 app.get('/usernames', (req, res) => {
@@ -93,7 +97,7 @@ app.get('/usernames', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -180,7 +184,7 @@ app.post('/signup', (req, res) => {
 
 app.post('/pay', (req, res) => {
   // TODO: check if user is still logged in (i.e. check cookie) here. If not, send back appropriate error response.
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -215,7 +219,7 @@ app.post('/pay', (req, res) => {
 
 
 app.get('/publicprofile', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -256,7 +260,7 @@ app.get('/publicprofile', (req, res) => {
 const FEED_DEFAULT_LENGTH = 5;
 
 app.get('/feed/global', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -281,7 +285,7 @@ app.get('/feed/global', (req, res) => {
 });
 
 app.get('/feed/all', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -302,7 +306,7 @@ app.get('/feed/all', (req, res) => {
 });
 
 app.get('/feed/user/:userId', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -332,7 +336,7 @@ app.get('/feed/user/:userId', (req, res) => {
 });
 
 app.get('/feed/profile', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -361,7 +365,7 @@ app.get('/feed/profile', (req, res) => {
 });
 
 app.get('/feed/relational', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -401,7 +405,17 @@ app.patch('/request', (req, res) => {
     })
 });
 
-<<<<<<< 8dff4caad77f233f1d0c6da025e5b220da1d6637
+app.post('/request', (req, res) => {
+  console.log(req.body);
+  db.deleteRequest(req.body.transactionId)
+    .then((results) => {
+      res.status(200).json();
+    }).catch(err => {
+      console.error('error deleting request', err);
+      res.sendStatus(500).json({error: 'server error'});
+    })
+});
+
 //==================================//
 //======= EMAIL INVITATION =========//
 //==================================//
@@ -436,18 +450,4 @@ router.get("/invite", function(req, res) {
 // https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
 
 //==================================//
-
-=======
-app.post('/request', (req, res) => {
-  console.log(req.body);
-  db.deleteRequest(req.body.transactionId)
-    .then((results) => {
-      res.status(200).json();
-    }).catch(err => {
-      console.error('error deleting request', err);
-      res.sendStatus(500).json({error: 'server error'});
-    })
-});
-
->>>>>>> dont use the cancel button
 module.exports = app;

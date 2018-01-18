@@ -7,7 +7,6 @@ import TwoFactorAuth from './TwoFactorAuth.jsx';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 
-
 class Login extends React.Component {
   constructor (props) {
     super(props);
