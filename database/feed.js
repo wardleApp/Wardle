@@ -173,5 +173,14 @@ module.exports = {
       .then(rows => {
         return rows.map((item) => formatOutput(item, userId));
      })
+  },
+  updateRequest: (id) => {
+    return pg('transactions')
+    .where('txn_id', '=', id)
+    .update({
+      pending: false
+    }).then(result => {
+      return result;
+    });
   }
 };

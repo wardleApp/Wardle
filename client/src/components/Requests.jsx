@@ -6,7 +6,10 @@ import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
 import axios from 'axios';
 
+<<<<<<< 0c02d3f8b5ce84132b13e9f9a47127cd6a4c224a
 <<<<<<< 79670a83d72a2954af53bf9a2371545c88a1963e
+=======
+>>>>>>> accept working
 class Requests extends React.Component {
   constructor (props) {
     super(props);
@@ -14,6 +17,7 @@ class Requests extends React.Component {
       open: false
     }
   }
+<<<<<<< 0c02d3f8b5ce84132b13e9f9a47127cd6a4c224a
 =======
 const Requests = (props) => {
   console.log(props.request);
@@ -60,6 +64,8 @@ const Requests = (props) => {
         secondaryTextLines={1}
       />
 >>>>>>> request modules
+=======
+>>>>>>> accept working
 
   handleAccept() {
     let payment = {
@@ -74,6 +80,7 @@ const Requests = (props) => {
     axios.post('/pay', payment).then(response => {
       this.props.refreshUserData(this.props.request.payee.userId);
     });
+<<<<<<< 0c02d3f8b5ce84132b13e9f9a47127cd6a4c224a
     this.handleDecline();
   }
 
@@ -114,6 +121,45 @@ const Requests = (props) => {
               }
               secondaryTextLines={1}
 
+=======
+    axios.patch('/request', {transactionId: this.props.request.transactionId}).then(response => {
+      this.props.getHistory(this.props.request.payee.userId);
+    });
+  }
+
+  handleDecline() {
+
+  }
+
+  handleCancel() {
+
+  }
+
+  render () {
+    console.log(this.props);
+    return (
+      <div>
+        {this.props.request.payee.userId === this.props.userId ? (
+          <div className='feed-container'>
+            <ListItem disabled={true}
+              leftAvatar={<Avatar src={'/images/no-image.gif'} />}
+              primaryText={
+                <span>
+                  <span className='feed-item-user'><Link to={`/${this.props.request.payer.username}`}>{this.props.request.payer.fullName}</Link></span> has sent you a payment request {'(private)'}
+                    <p className={this.props.request.note === '' ? 'feed-empty-note' : 'feed-item-note'}>{this.props.request.note === '' ? 'empty note' : this.props.request.note}</p>
+                  </span>
+                }
+              rightAvatar={
+                <div className='feed-item-amount showDebit'>
+                  {this.props.request.amount}
+                </div>
+              }
+              secondaryText={
+                <div className='feed-item-timestamp'>{this.props.request.timestamp}</div>
+              }
+              secondaryTextLines={1}
+
+>>>>>>> accept working
               rightIconButton ={
                 <div className="request-buttons">
                   <FlatButton label="Accept" primary={true} onClick={this.handleAccept.bind(this)} />

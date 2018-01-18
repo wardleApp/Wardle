@@ -310,3 +310,12 @@ body {
 .member-tag {
   margin: 10px;
 }
+
+/* request component */
+.request-buttons {
+  margin-top: 75px;
+}
+.feed-empty-note {
+  color: grey;
+  font-style: italic;
+}

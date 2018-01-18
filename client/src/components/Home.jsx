@@ -12,7 +12,11 @@ class Home extends React.Component {
     this.state = {
       history: []
     }
-    axios('/feed/all', {params: {userId: this.props.userInfo.userId}})
+    this.getHistory(this.props.userInfo.userId);
+  }
+
+  getHistory(userId) {
+    axios('/feed/all', {params: {userId: userId}})
       .then((results) =>{
         this.setState({history: results.data.items});
       });
@@ -66,8 +70,8 @@ class Home extends React.Component {
             <MiniProfile
               balance={this.props.balance}
               userInfo={this.props.userInfo}/>
-            {this.state.history.filter(transaction => transaction.request).map((transaction, index) =>
-              <Requests key={index} request={transaction} userId={this.props.userInfo.userId}/>
+            {this.state.history.filter(transaction => transaction.pending).map((transaction, index) =>
+              <Requests key={index} request={transaction} userId={this.props.userInfo.userId} refreshUserData={this.props.refreshUserData} getHistory={this.getHistory.bind(this)}/>
             )}
           </div>
         </div>
