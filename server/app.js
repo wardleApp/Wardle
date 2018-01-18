@@ -63,7 +63,8 @@ app.post('/login', (req, res) => {
     } else {
       if (row.length) {
         if (bcrypt.compareSync(password, row[0].password)) {
-          session.userId = row[0].id
+          let sessionId = row[0].id;
+          // session.userId = row[0].id
           res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
           res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password});
         } else {
@@ -223,10 +224,8 @@ app.get('/publicprofile', (req, res) => {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
-
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
-
 
   let username = req.query.username;
   username = username && _.escape(username.replace(/"/g,"'"));
@@ -340,7 +339,6 @@ app.get('/feed/profile', (req, res) => {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
-
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
 
@@ -369,7 +367,6 @@ app.get('/feed/relational', (req, res) => {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
-
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
 
@@ -396,6 +393,13 @@ app.get('*', (req, res) => {
 });
 
 app.patch('/request', (req, res) => {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   db.updateRequest(req.body.transactionId)
     .then((results) => {
       res.status(201).json();
@@ -406,6 +410,12 @@ app.patch('/request', (req, res) => {
 });
 
 app.post('/request', (req, res) => {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
   console.log(req.body);
   db.deleteRequest(req.body.transactionId)
     .then((results) => {

@@ -159,6 +159,7 @@ class App extends React.Component {
     axios('/logout')
     .then((response) => {
       console.log('Logout success');
+      console.log(response);
     })
     .catch((err) => {
       console.log('Logout unsuccesful');
@@ -222,6 +223,14 @@ class App extends React.Component {
     };
 
     return (
+      // {
+      //   let cookie = document.cookie || null;
+
+      //   if (cookie !== null && this.state.isLoggedIn !== true) {
+      //     let userId = parseInt(cookie.split('=')[1])
+      //     this.logUserIn(userId);
+      //   }
+      // }
       <MuiThemeProvider muiTheme={muiTheme}>
         <BrowserRouter>
           <Switch>
