@@ -9,13 +9,17 @@ const session = require('express-session');
 const morgan = require('morgan');
 var path = require('path');
 const _ = require('underscore');
+
+/* Dillon Experimental Routes */
 const dillonRoutes = require('./dillonRoutes.js');
+const index = require('./index.js');
+/* Dillon Experimental Routes */
 
 //for sending emails
 const sgMail = require('@sendgrid/mail');
 
 // A for allowing cookie sending
-app.use(cors({
+app.use(cors({ 
     origin: "localhost:3000",
     credentials: true
 }))
@@ -401,7 +405,17 @@ app.patch('/request', (req, res) => {
     })
 });
 
-<<<<<<< 8dff4caad77f233f1d0c6da025e5b220da1d6637
+app.post('/request', (req, res) => {
+  console.log(req.body);
+  db.deleteRequest(req.body.transactionId)
+    .then((results) => {
+      res.status(200).json();
+    }).catch(err => {
+      console.error('error deleting request', err);
+      res.sendStatus(500).json({error: 'server error'});
+    })
+});
+
 //==================================//
 //======= EMAIL INVITATION =========//
 //==================================//
@@ -436,18 +450,4 @@ router.get("/invite", function(req, res) {
 // https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
 
 //==================================//
-
-=======
-app.post('/request', (req, res) => {
-  console.log(req.body);
-  db.deleteRequest(req.body.transactionId)
-    .then((results) => {
-      res.status(200).json();
-    }).catch(err => {
-      console.error('error deleting request', err);
-      res.sendStatus(500).json({error: 'server error'});
-    })
-});
-
->>>>>>> dont use the cancel button
 module.exports = app;

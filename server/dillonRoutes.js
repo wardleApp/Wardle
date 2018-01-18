@@ -40,4 +40,11 @@ router.post('/twoFactorAuthCompare', (req, res) => {
 	}
 })
 
+router.post('/processOffer', (req, res) => {
+	dbProfile.getProfileDataByUsername(req.body.username)
+	.then((data) => {
+		res.status(201).json(data);
+	})
+})
+
 exports.router = router;

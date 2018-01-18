@@ -4,12 +4,13 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom'
 import $ from 'jquery';
 import axios from 'axios';
+import io from "socket.io-client";
 
 // ---------- Material UI ---------- //
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
-// ---------- Componenets ---------- //
+// ---------- Components ---------- //
 import LoggedOutHome from './components/LoggedOutHome.jsx';
 import Home from './components/Home.jsx';
 import Login from './components/Login.jsx';
@@ -33,8 +34,9 @@ class App extends React.Component {
       globalFeed: {},
       userFeed: {},
       balance: null,
-      userInfo: {}, 
-    }
+      userInfo: {}
+    };
+    this.socket = io('http://127.0.0.1:3000/');
   }
 
   loadUserData(userId) {
@@ -187,6 +189,7 @@ class App extends React.Component {
                 userInfo={this.state.userInfo}
                 balance={this.state.balance}
                 cookie={this.state.cookie}
+                socket={this.socket}
                 {...props}
               />
           }
