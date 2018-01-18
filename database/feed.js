@@ -182,5 +182,12 @@ module.exports = {
     }).then(result => {
       return result;
     });
+  },
+  deleteRequest: (id) => {
+    return pg('transactions')
+    .where('txn_id', '=', id)
+    .del().then(results => {
+      return results;
+    })
   }
 };

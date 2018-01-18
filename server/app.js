@@ -394,7 +394,6 @@ app.get('*', (req, res) => {
 app.patch('/request', (req, res) => {
   db.updateRequest(req.body.transactionId)
     .then((results) => {
-      console.log(results);
       res.status(201).json();
     }).catch(err => {
       console.error('error updating pending status', err);
@@ -402,6 +401,7 @@ app.patch('/request', (req, res) => {
     })
 });
 
+<<<<<<< 8dff4caad77f233f1d0c6da025e5b220da1d6637
 //==================================//
 //======= EMAIL INVITATION =========//
 //==================================//
@@ -437,4 +437,17 @@ router.get("/invite", function(req, res) {
 
 //==================================//
 
+=======
+app.post('/request', (req, res) => {
+  console.log(req.body);
+  db.deleteRequest(req.body.transactionId)
+    .then((results) => {
+      res.status(200).json();
+    }).catch(err => {
+      console.error('error deleting request', err);
+      res.sendStatus(500).json({error: 'server error'});
+    })
+});
+
+>>>>>>> dont use the cancel button
 module.exports = app;

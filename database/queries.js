@@ -16,5 +16,6 @@ module.exports = {
   myFeed: feed.myFeed,
   profileFeed: feed.profileFeed,
   profileFeedRelational: feed.profileFeedRelational,
-  updateRequest: feed.updateRequest
+  updateRequest: feed.updateRequest,
+  deleteRequest: feed.deleteRequest
 }

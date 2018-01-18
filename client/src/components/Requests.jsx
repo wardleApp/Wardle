@@ -80,6 +80,7 @@ const Requests = (props) => {
     axios.post('/pay', payment).then(response => {
       this.props.refreshUserData(this.props.request.payee.userId);
     });
+<<<<<<< 8dff4caad77f233f1d0c6da025e5b220da1d6637
 <<<<<<< 0c02d3f8b5ce84132b13e9f9a47127cd6a4c224a
     this.handleDecline();
   }
@@ -125,18 +126,26 @@ const Requests = (props) => {
     axios.patch('/request', {transactionId: this.props.request.transactionId}).then(response => {
       this.props.getHistory(this.props.request.payee.userId);
     });
+=======
+    this.handleDecline();
+>>>>>>> dont use the cancel button
   }
 
   handleDecline() {
-
+    axios.patch('/request', {transactionId: this.props.request.transactionId}).then(response => {
+      this.props.getHistory(this.props.request.payee.userId);
+      this.props.refreshUserData(this.props.request.payee.userId);
+    });
   }
 
   handleCancel() {
-
+    axios.post('/request', {transactionId: this.props.request.transactionId}).then(response => {
+      this.props.getHistory(this.props.request.payer.userId);
+      this.props.refreshUserData(this.props.request.payer.userId);
+    });
   }
 
   render () {
-    console.log(this.props);
     return (
       <div>
         {this.props.request.payee.userId === this.props.userId ? (

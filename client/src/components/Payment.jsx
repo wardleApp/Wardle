@@ -92,6 +92,7 @@ class Payment extends React.Component {
           paymentFail: false
         });
         this.props.refreshUserData(this.props.payerId);
+        this.props.getHistory(this.props.payerId);
       })
       .catch(error => {
         if (error.response) {

@@ -56,7 +56,7 @@ class Home extends React.Component {
               refreshUserData={this.props.refreshUserData}
               history={this.props.history}
               logUserOut={this.props.logUserOut}
-              />
+              getHistory={this.getHistory.bind(this)} />
             <FeedContainer
               userId={this.props.userInfo.userId}
               base='/'

@@ -38,11 +38,6 @@ const FeedTransaction = (props) => {
             <p className='feed-item-note'>{props.transaction.note}</p>
           </span>
         }
-        rightAvatar={''/*
-          <div className={isDebit ? 'feed-item-amount showDebit' : 'feed-item-amount'}>
-            {props.transaction.amount}
-          </div>
-        */}
         secondaryText={
          <div className='feed-item-timestamp'>{props.transaction.timestamp}</div>
         }
