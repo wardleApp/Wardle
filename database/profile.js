@@ -41,6 +41,7 @@ module.exports = {
       .where({username: username})
       .update({'twofactor': currentAuth})
       .then((result) => {
+        console.log('This should consol log result now', result);
         resolve(result);
       })
       .catch((error) => {

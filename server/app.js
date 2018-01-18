@@ -79,7 +79,7 @@ app.post('/login', (req, res) => {
 
 app.get('/logout', (req, res) => {
   console.log('Cookie destroyed');
-  res.clearCookie("session-cookie").send(200);
+  res.clearCookie("session-cookie").sendStatus(200);
 })
 
 app.get('/usernames', (req, res) => {
@@ -97,7 +97,7 @@ app.get('/usernames', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -184,7 +184,7 @@ app.post('/signup', (req, res) => {
 
 app.post('/pay', (req, res) => {
   // TODO: check if user is still logged in (i.e. check cookie) here. If not, send back appropriate error response.
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -219,7 +219,7 @@ app.post('/pay', (req, res) => {
 
 
 app.get('/publicprofile', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -260,7 +260,7 @@ app.get('/publicprofile', (req, res) => {
 const FEED_DEFAULT_LENGTH = 5;
 
 app.get('/feed/global', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -285,7 +285,7 @@ app.get('/feed/global', (req, res) => {
 });
 
 app.get('/feed/all', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -306,7 +306,7 @@ app.get('/feed/all', (req, res) => {
 });
 
 app.get('/feed/user/:userId', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -336,7 +336,7 @@ app.get('/feed/user/:userId', (req, res) => {
 });
 
 app.get('/feed/profile', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -365,7 +365,7 @@ app.get('/feed/profile', (req, res) => {
 });
 
 app.get('/feed/relational', (req, res) => {
-  if (req.headers.cookie !== 'session-cookie=loggedIn') {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }

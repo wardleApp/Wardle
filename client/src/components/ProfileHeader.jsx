@@ -26,13 +26,12 @@ class ProfileHeader extends React.Component {
     this.state = {
       toggled: this.props.profileInfo.twofactor
     }
-    console.log('profileInfo', this.props.profileInfo);
   }
 
   updateTwoFactorChoice() {
     axios.post('/dillon/enable2factorauth', {
       username: this.props.profileInfo.username,
-      currentAuth: this.state.toggled
+      currentAuth: !this.props.profileInfo.twofactor
     })
     .then((response) => {
       console.log('This is the response we get back from twofactortoggle', response);
@@ -46,6 +45,7 @@ class ProfileHeader extends React.Component {
     this.setState({toggled: !this.state.toggled});
     this.props.twoFactorAuthToggle();
     this.updateTwoFactorChoice();
+    this.props.loadProfileData(this.props.profileInfo.username);
   }
 
   render() {
