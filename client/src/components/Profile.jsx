@@ -84,7 +84,11 @@ class Profile extends React.Component {
           })
         }
       })
-      .catch((err) => {
+      .catch((err) => { 
+        if (err.response && err.response.status === 403) {
+          this.props.logUserOut();
+          alert('User has session has timed out.');
+        }
         console.error(err);
       }); 
   }
@@ -100,6 +104,10 @@ class Profile extends React.Component {
         this.setState({
           unknownUser: true
         })
+        if (err.response && err.response.status === 403) {
+          this.props.logUserOut();
+          alert('User has session has timed out.');
+        }
         console.error(err);
       });
   }
@@ -139,7 +147,7 @@ class Profile extends React.Component {
         <div className='body-container'>
           {this.state.unknownUser 
             ? <div>User does not exist</div> 
-            : !this.state.profileInfo.twofactor ? <div></div> 
+            /*: !this.state.profileInfo.twofactor ? <div></div> */
             : <div className='pay-feed-container'>
               <ProfileHeader profileInfo={this.state.profileInfo} twoFactorAuthToggle={this.props.twoFactorAuthToggle}/>
               {this.props.userInfo.username !== this.props.match.params.username
