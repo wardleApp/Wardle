@@ -416,7 +416,6 @@ app.post('/request', (req, res) => {
   }
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
-  console.log(req.body);
   db.deleteRequest(req.body.transactionId)
     .then((results) => {
       res.status(200).json();
@@ -460,4 +459,19 @@ router.get("/invite", function(req, res) {
 // https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
 
 //==================================//
+<<<<<<< HEAD
+=======
+
+app.post('/request', (req, res) => {
+  console.log(req.body);
+  db.deleteRequest(req.body.transactionId)
+    .then((results) => {
+      res.status(200).json();
+    }).catch(err => {
+      console.error('error deleting request', err);
+      res.sendStatus(500).json({error: 'server error'});
+    })
+});
+
+>>>>>>> Rebasing
 module.exports = app;
