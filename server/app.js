@@ -41,8 +41,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        expires: 60000, 
-        path: '/login', 
+        expires: 60000,
+        path: '/login',
         secure: false
     }
 }));
@@ -96,7 +96,7 @@ app.get('/profile', (req, res) => {
   if (req.headers.cookie !== 'session-cookie=loggedIn') {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
-  } 
+  }
 
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
@@ -183,7 +183,7 @@ app.post('/pay', (req, res) => {
   if (req.headers.cookie !== 'session-cookie=loggedIn') {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
-  } 
+  }
 
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
@@ -218,7 +218,7 @@ app.get('/publicprofile', (req, res) => {
   if (req.headers.cookie !== 'session-cookie=loggedIn') {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
-  } 
+  }
 
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
@@ -259,7 +259,7 @@ app.get('/feed/global', (req, res) => {
   if (req.headers.cookie !== 'session-cookie=loggedIn') {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
-  } 
+  }
 
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
@@ -284,7 +284,7 @@ app.get('/feed/all', (req, res) => {
   if (req.headers.cookie !== 'session-cookie=loggedIn') {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
-  } 
+  }
 
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
@@ -305,7 +305,7 @@ app.get('/feed/user/:userId', (req, res) => {
   if (req.headers.cookie !== 'session-cookie=loggedIn') {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
-  } 
+  }
 
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
@@ -335,7 +335,7 @@ app.get('/feed/profile', (req, res) => {
   if (req.headers.cookie !== 'session-cookie=loggedIn') {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
-  } 
+  }
 
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
@@ -364,7 +364,7 @@ app.get('/feed/relational', (req, res) => {
   if (req.headers.cookie !== 'session-cookie=loggedIn') {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
-  } 
+  }
 
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
@@ -391,6 +391,17 @@ app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '..' , './client/dist/index.html'));
 });
 
+app.patch('/request', (req, res) => {
+  db.updateRequest(req.body.transactionId)
+    .then((results) => {
+      res.status(201).json();
+    }).catch(err => {
+      console.error('error updating pending status', err);
+      res.sendStatus(500).json({error: 'server error'});
+    })
+});
+
+<<<<<<< 8dff4caad77f233f1d0c6da025e5b220da1d6637
 //==================================//
 //======= EMAIL INVITATION =========//
 //==================================//
@@ -426,8 +437,17 @@ router.get("/invite", function(req, res) {
 
 //==================================//
 
+=======
+app.post('/request', (req, res) => {
+  console.log(req.body);
+  db.deleteRequest(req.body.transactionId)
+    .then((results) => {
+      res.status(200).json();
+    }).catch(err => {
+      console.error('error deleting request', err);
+      res.sendStatus(500).json({error: 'server error'});
+    })
+});
 
+>>>>>>> dont use the cancel button
 module.exports = app;
-
-
-

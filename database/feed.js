@@ -23,6 +23,8 @@ const formatOutput = (item, userId) => {
     note: item.note,
     timestamp: formattedDate,
     private: item.private,
+    request: item.request,
+    pending: item.pending,
     payer: {
       userId: item.payer_id,
       username: item.payer_username,
@@ -49,6 +51,8 @@ const FEED_FIELDS = ['transactions.txn_id',
   'transactions.amount',
   'transactions.created_at',
   'transactions.private',
+  'transactions.request',
+  'transactions.pending',
   {payer_id: 'users_transactions.payer_id'},
   {payer_firstName: 'payer.first_name'},
   {payer_username: 'payer.username'},
@@ -169,5 +173,21 @@ module.exports = {
       .then(rows => {
         return rows.map((item) => formatOutput(item, userId));
      })
+  },
+  updateRequest: (id) => {
+    return pg('transactions')
+    .where('txn_id', '=', id)
+    .update({
+      pending: false
+    }).then(result => {
+      return result;
+    });
+  },
+  deleteRequest: (id) => {
+    return pg('transactions')
+    .where('txn_id', '=', id)
+    .del().then(results => {
+      return results;
+    })
   }
 };
