@@ -6,44 +6,7 @@ const helpers = require('./helpers.js');
 var path = require('path');
 const _ = require('underscore');
 const dillonRoutes = require('./dillonRoutes.js');
-
-//for sending emails
-const sgMail = require('@sendgrid/mail');
-
-//==================================//
-//======= EMAIL INVITATION =========//
-//==================================//
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-var router = express.Router();
-
-router.get("/invite", function(req, res) {
-
-  let token = "guava0001";
-  let link = "https://wardle.herokuapp.com/signup";
-
-  let sender = "Jackie Jou";
-  let recipient = "Nuno Neves";
-
-  let subject = "Wardle welcomes you.";
-  let text = `Greetings, ${recipient}. \n ${sender} has invited you to the future of peer payment. \n \n Sign up on ${link} and use the following token to give your friend a Jackson: \n ${token} \n\n With Love, \n Wardle`;
-
-  const msg = {
-    to: 'youknownuno@example.com',
-    from: 'joujackie@example.com',
-    subject: subject,
-    text: text,
-    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-  };
-
-  sgMail.send(msg);
-});
-
-// test this on:
-// https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
-
-//==================================//
+const morgan = require('morgan');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -51,10 +14,75 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
 app.use(bodyParser.json());
 
+// logs all api requests, tiny is the default
+// morgan is useful for testing, but could slow things down
+// disable it before deployment there are ways to set this as a condition
+app.use(morgan("tiny")); 
+
 app.use(express.static(__dirname + '/../client/dist'));
 
 // DILLON'S ROUTES
 app.use('/dillon', dillonRoutes.router);
+
+
+
+//==================================//
+//======= EMAIL INVITATION =========//
+//==================================//
+
+//for sending emails
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey('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');
+
+app.get("/invite", function(req, res) {
+
+  console.log("router received invite request");
+
+  let token = "guava0001";
+  let link = "https://wardle.herokuapp.com/signup";
+
+  let sender = "Wardle";
+  let recipient = "Nuno";
+
+  let subject = "Wardle welcomes you.";
+  let text = `Greetings, ${recipient}. \n ${sender} has invited you to the future of peer payment. \n \n Sign up on ${link} and use the following token to give your friend a Jackson: \n ${token} \n\n With Love, \n Wardle`;
+
+  const msg = {
+    to: 'youknownuno@gmail.com',
+    from: 'wardleapp@gmail.com',
+    subject: subject,
+    text: text,
+    html: `<strong>${text}</strong>`,
+  };
+
+  console.log("MESSAGE ========== ", msg); // should display on server
+
+  sgMail.send(msg);
+
+  res.status(200).send(msg); // new syntax
+
+});
+
+//==================================//
+
+// rewarding author of referral with the token
+app.post('/reward', function(req, res) {
+  let token = req.body.token;
+  console.log("token received from axios = ", token);
+  db.reward(token);
+  res.status(201).send("token processed");
+});
+
+
+//find token by user
+app.get('/findToken', function(req, res) {
+  let username = req.body.username;
+  db.findTokenByUser(username, function(token) {
+    console.log(`token found for username ${username} = ${token}`);
+    res.status(201).send(token);
+  });
+  
+});
 
 app.post('/login', (req, res) => {
   var {username, password} = req.body;
@@ -91,6 +119,8 @@ app.get('/usernames', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
+  console.log("request to /profile = ", req.query.userId); //query is empty
+
   var userId = req.query.userId;
   db.profile.getUserInfo(parseInt(_.escape(userId.replace(/"/g,"'"))), (err, row) => {
     if (err) {
@@ -145,10 +175,31 @@ app.post('/signup', (req, res) => {
   for(let key in req.body) {
     signupData[_.escape(key.replace(/"/g,"'"))] = _.escape(req.body[key].replace(/"/g,"'"));
   }
+
+    console.log("signup token will be created here");
+
+    signupData.token = helpers.generateToken(signupData.username);
+
+    console.log("SignUpData created: ", signupData);
+    console.log(`token created for username ${req.body.username} = ${signupData.token}`)
+
+
+  
+
   db.signup.newUserSignup(signupData, 100)
+    
+    /* was:
     .then(userId => {
-      res.status(201).json({ userId: userId });
+-      res.status(201).json({ userId: userId });
+    */
+    .then(function() {
+      db.insertToken( req.body.username, signupData.token)
+      .then(function() {
+        res.status(201).send("token and user created");
+      })
+
     })
+    
     .catch(err => {
       console.error('error on user signup:', err.message);
       // TODO: send responses depending on what type of error is thrown
@@ -162,6 +213,9 @@ app.post('/signup', (req, res) => {
         res.status(400).json({ error: "Improper format." });
       }
     })
+
+
+
 })
 
 app.post('/pay', (req, res) => {
@@ -321,5 +375,12 @@ app.get('/feed/relational', (req, res) => {
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '..' , './client/dist/index.html'));
 });
+
+
+// test this on:
+// https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
+
+//==================================//
+
 
 module.exports = app;
