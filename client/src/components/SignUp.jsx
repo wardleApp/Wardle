@@ -6,6 +6,7 @@ import FlatButton from 'material-ui/FlatButton';
 import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
 
+
 class SignUp extends React.Component {
   constructor (props) {
     super(props);
@@ -18,6 +19,7 @@ class SignUp extends React.Component {
         phone: '',
         password: '',
         avatarUrl: '',
+        referralToken: ''
       },
       submitted: false,
       didSignupFail: false,
@@ -36,7 +38,10 @@ class SignUp extends React.Component {
     this.setState({ submitted: true }, () => {
         setTimeout(() => this.setState({ submitted: false }), 5000);
     });
-    
+
+    //occuring twice, must fix
+    this.validateToken(this.state.formData.referralToken);
+
     let user = this.state.formData;
 
     axios.post('/signup', user)
@@ -44,6 +49,7 @@ class SignUp extends React.Component {
         let userId = response.data.userId;
         this.props.logUserIn(userId);
         this.props.history.push('/');
+        
       })
       .catch((error) => {
         if (error.response && error.response.status === 422) {
@@ -71,6 +77,17 @@ class SignUp extends React.Component {
       return true;
     });
   }
+
+  //validates referralToken and rewards user
+  validateToken(referralToken) {
+    axios.post('/reward', { token:referralToken })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    }
 
   render() {
 
@@ -149,8 +166,14 @@ class SignUp extends React.Component {
                 value={formData.avatarUrl}
                 name="avatarUrl"
               /><br/>
+              <TextValidator
+                floatingLabelText="Token"
+                onChange={this.handleInputChanges.bind(this)}
+                value={formData.referralToken}
+                name="referralToken"
+                 /><br/>
             <div>
-              <button className='btn' onClick={this.signUserUp.bind(this)}>Create Account</button>
+              <button className='btn' type='submit'>Create Account</button>
               {this.state.didSignupFail && 
                 <span className="error-text">
                   {this.state.errorCode === 422
