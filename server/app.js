@@ -98,7 +98,7 @@ app.get('/usernames', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -185,7 +185,7 @@ app.post('/signup', (req, res) => {
 
 app.post('/pay', (req, res) => {
   // TODO: check if user is still logged in (i.e. check cookie) here. If not, send back appropriate error response.
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -220,7 +220,7 @@ app.post('/pay', (req, res) => {
 
 
 app.get('/publicprofile', (req, res) => {
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -259,7 +259,7 @@ app.get('/publicprofile', (req, res) => {
 const FEED_DEFAULT_LENGTH = 5;
 
 app.get('/feed/global', (req, res) => {
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -284,7 +284,7 @@ app.get('/feed/global', (req, res) => {
 });
 
 app.get('/feed/all', (req, res) => {
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -305,7 +305,7 @@ app.get('/feed/all', (req, res) => {
 });
 
 app.get('/feed/user/:userId', (req, res) => {
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -335,7 +335,7 @@ app.get('/feed/user/:userId', (req, res) => {
 });
 
 app.get('/feed/profile', (req, res) => {
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -363,7 +363,7 @@ app.get('/feed/profile', (req, res) => {
 });
 
 app.get('/feed/relational', (req, res) => {
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -393,7 +393,7 @@ app.get('*', (req, res) => {
 });
 
 app.patch('/request', (req, res) => {
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
@@ -410,12 +410,13 @@ app.patch('/request', (req, res) => {
 });
 
 app.post('/request', (req, res) => {
-  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+  if (!req.headers.cookie || !req.headers.cookie.includes('session-cookie=loggedIn')) {
     res.status(403).json({ error: 'User logged out for security reasons'});
     return;
   }
   // Refresh the cookie timer
   res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   db.deleteRequest(req.body.transactionId)
     .then((results) => {
       res.status(200).json();
@@ -459,19 +460,5 @@ router.get("/invite", function(req, res) {
 // https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
 
 //==================================//
-<<<<<<< HEAD
-=======
 
-app.post('/request', (req, res) => {
-  console.log(req.body);
-  db.deleteRequest(req.body.transactionId)
-    .then((results) => {
-      res.status(200).json();
-    }).catch(err => {
-      console.error('error deleting request', err);
-      res.sendStatus(500).json({error: 'server error'});
-    })
-});
-
->>>>>>> Rebasing
 module.exports = app;
