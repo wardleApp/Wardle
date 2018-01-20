@@ -42,7 +42,7 @@ class Login extends React.Component {
   }
 }
 
-let mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     isLoggedIn: state.isLoggedIn,
     actionAttemptLogin
@@ -50,6 +50,7 @@ let mapStateToProps = state => {
 }
 
 export default withRouter(connect(mapStateToProps)(Login));
+
 
 // import React from 'react';
 // import axios from 'axios';
