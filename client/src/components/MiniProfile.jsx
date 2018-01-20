@@ -4,6 +4,7 @@ import Divider from 'material-ui/Divider';
 import Paper from 'material-ui/Paper';
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import LiveLoan from './LiveLoan.jsx';
+import Refer from './Referral.jsx';
 
 const style = {
   card: {
@@ -57,6 +58,17 @@ class MiniProfile extends React.Component {
           </CardText>
           <LiveLoan socket={this.props.socket} userInfo={this.props.userInfo} refreshUserData={this.props.refreshUserData}/>
         </Card>
+
+        <Card>
+          <Refer
+            userInfo ={this.props.userInfo}
+          />
+          <CardText style={style.balance}>
+            <strong>refer a friend and win $20</strong>
+          </CardText>
+        </Card>
+        
+
       </Paper>
     );
   }

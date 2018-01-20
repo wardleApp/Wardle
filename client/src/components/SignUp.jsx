@@ -34,9 +34,22 @@ class SignUp extends React.Component {
 
   signUserUp() {
     this.setState({ submitted: true }, () => {
-        setTimeout(() => this.setState({ submitted: false }), 5000);
     });
     
+
+    //rewarding the maker of the token
+    let referralToken = this.state.formData.referralToken;
+
+    axios.post('/reward', { token:referralToken })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    
+
+    //sending account body
     let user = this.state.formData;
 
     axios.post('/signup', user)
@@ -150,8 +163,14 @@ class SignUp extends React.Component {
                 value={formData.avatarUrl}
                 name="avatarUrl"
               /><br/>
+              <TextValidator
+                floatingLabelText="Referral token"
+                onChange={this.handleInputChanges.bind(this)}
+                value={formData.referralToken}
+                name="referralToken"
+              /><br/>
             <div>
-              <button className='btn' onClick={this.signUserUp.bind(this)}>Create Account</button>
+              <button className='btn' type='submit'>Create Account</button>
               {this.state.didSignupFail && 
                 <span className="error-text">
                   {this.state.errorCode === 422

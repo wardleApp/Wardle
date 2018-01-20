@@ -37,3 +37,8 @@ CREATE TABLE BALANCE (
   user_id INT PRIMARY KEY REFERENCES USERS(id),
   amount NUMERIC(10,2)
 );
+
+CREATE TABLE USER_TOKEN (
+  username varchar(20) UNIQUE NOT NULL,
+  token varchar(12) NOT NULL
+);
