@@ -79,7 +79,7 @@ const mapStateToProps = (state) => {
     userId: state.userInfo.userId,
     globalFeed: state.globalFeed,
     userFeed: state.userFeed,
-    history: state.history
+    history: state.history,
   }
 }
 
