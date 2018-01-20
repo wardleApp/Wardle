@@ -6,7 +6,6 @@ import FlatButton from 'material-ui/FlatButton';
 import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
 
-
 class SignUp extends React.Component {
   constructor (props) {
     super(props);
@@ -19,7 +18,6 @@ class SignUp extends React.Component {
         phone: '',
         password: '',
         avatarUrl: '',
-        referralToken: ''
       },
       submitted: false,
       didSignupFail: false,
@@ -36,12 +34,22 @@ class SignUp extends React.Component {
 
   signUserUp() {
     this.setState({ submitted: true }, () => {
-        setTimeout(() => this.setState({ submitted: false }), 5000);
     });
+    
 
-    //occuring twice, must fix
-    this.validateToken(this.state.formData.referralToken);
+    //rewarding the maker of the token
+    let referralToken = this.state.formData.referralToken;
 
+    axios.post('/reward', { token:referralToken })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    
+
+    //sending account body
     let user = this.state.formData;
 
     axios.post('/signup', user)
@@ -50,7 +58,6 @@ class SignUp extends React.Component {
         this.props.logUserIn(userId);
         // <Redirect to="/" push/>
         this.props.history.push('/');
-        
       })
       .catch((error) => {
         if (error.response && error.response.status === 422) {
@@ -78,17 +85,6 @@ class SignUp extends React.Component {
       return true;
     });
   }
-
-  //validates referralToken and rewards user
-  validateToken(referralToken) {
-    axios.post('/reward', { token:referralToken })
-    .then(function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-    }
 
   render() {
 
@@ -168,11 +164,11 @@ class SignUp extends React.Component {
                 name="avatarUrl"
               /><br/>
               <TextValidator
-                floatingLabelText="Token"
+                floatingLabelText="Referral token"
                 onChange={this.handleInputChanges.bind(this)}
                 value={formData.referralToken}
                 name="referralToken"
-                 /><br/>
+              /><br/>
             <div>
               <button className='btn' type='submit'>Create Account</button>
               {this.state.didSignupFail && 

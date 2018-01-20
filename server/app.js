@@ -15,10 +15,7 @@ const dillonRoutes = require('./dillonRoutes.js');
 const index = require('./index.js');
 /* Dillon Experimental Routes */
 
-//for sending emails
-const sgMail = require('@sendgrid/mail');
-
-// A for allowing cookie sending
+// for allowing cookie sending
 app.use(cors({ 
     origin: "localhost:3000",
     credentials: true
@@ -51,6 +48,34 @@ app.use(session({
     }
 }));
 
+
+//==================================//
+//============ ENDPOINTS ===========//
+//==================================//
+
+//=========== REWARDING ============//
+
+// rewarding author of referral
+app.post('/reward', function(req, res) {
+  let token = req.body.token;
+  console.log("token received from axios = ", token);
+  db.reward(token);
+  res.status(201).send("token processed");
+});
+
+//find token by user
+app.get('/findToken', function(req, res) {
+  
+  let username = "dillon"
+
+  db.findTokenByUser(username)
+  .then((data) => {
+    console.log('this is the data we get back', data.rows[0].token);
+    res.status(200).json(data)
+  })
+});
+
+//==================================//
 
 app.post('/login', (req, res) => {
   let session = req.session;
@@ -160,8 +185,23 @@ app.post('/signup', (req, res) => {
   for(let key in req.body) {
     signupData[_.escape(key.replace(/"/g,"'"))] = _.escape(req.body[key].replace(/"/g,"'"));
   }
+
+
+  console.log("signup token will be created here");
+
+  signupData.token = helpers.generateToken(signupData.username);
+
+  console.log("SignUpData created: ", signupData);
+  console.log(`token created for username ${req.body.username} = ${signupData.token}`)
+
+
   db.signup.newUserSignup(signupData, 100)
     .then(userId => {
+
+      // slip the token in the database
+      db.insertToken( req.body.username, signupData.token).then(function() {
+        res.status(201).send("token and user created");
+      })
 
       // Initiate inital cookie on successful sign up
       res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
@@ -391,6 +431,72 @@ app.get('/feed/relational', (req, res) => {
     })
 });
 
+
+//==================================//
+//======= EMAIL INVITATION =========//
+//==================================//
+
+
+//for sending emails
+const sgMail = require('@sendgrid/mail');
+
+//source api key from .env file
+require('dotenv').config();
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+app.post("/invite", function(req, res) {
+
+  let recipientAddress = req.body.email;
+  let username = req.body.userInfo.username;;
+
+  db.findTokenByUser(username)
+  .then((data) => {
+
+    let token = data.rows[0].token;
+    let link = "https://wardle.herokuapp.com/signup";
+
+    let sender = req.body.userInfo.displayName;
+    let subject = "Wardle welcomes you";
+    let text = `
+    Greetings!
+    
+    Your friend ${sender} has invited you to Wardle, the future of peer payment.
+
+    Use this special token: ${token} and sign up on wardle.herokuapp.com/signup to give your friend a Jackson.
+
+    With Love,
+    Wardle`;
+
+    const msg = {
+      to: recipientAddress,
+      from: "noreply@wardle.com",
+      subject: subject,
+      text: text,
+      html: `<div>
+  <p>Greetings!</p>
+  
+  <p>Your friend <strong>${sender}</strong> has invited you to <strong>Wardle</strong>, the future of peer payment.</p>
+  
+  <p>Use this special token: <strong>${token}</strong> and sign up on <a href="https://wardle.herokuapp.com/signup">wardle.herokuapp.com/signup</a> to give your friend a Jackson.</p> 
+   <p>
+     With Love,
+   </p>
+  <strong>Wardle</strong>
+   
+</div>`,
+    };
+
+  console.log("MESSAGE ========== ", msg);
+
+  sgMail.send(msg);  
+  res.status(200).json(msg);
+  });
+});
+
+//==================================//
+
+// get * blocks all get requests down the script
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '..' , './client/dist/index.html'));
 });
@@ -416,38 +522,5 @@ app.post('/request', (req, res) => {
     })
 });
 
-//==================================//
-//======= EMAIL INVITATION =========//
-//==================================//
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-var router = express.Router();
-
-router.get("/invite", function(req, res) {
-
-  let token = "guava0001";
-  let link = "https://wardle.herokuapp.com/signup";
-
-  let sender = "Jackie Jou";
-  let recipient = "Nuno Neves";
-
-  let subject = "Wardle welcomes you.";
-  let text = `Greetings, ${recipient}. \n ${sender} has invited you to the future of peer payment. \n \n Sign up on ${link} and use the following token to give your friend a Jackson: \n ${token} \n\n With Love, \n Wardle`;
-
-  const msg = {
-    to: 'youknownuno@example.com',
-    from: 'joujackie@example.com',
-    subject: subject,
-    text: text,
-    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-  };
-
-  sgMail.send(msg);
-});
-
-// test this on:
-// https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
-
-//==================================//
 module.exports = app;
