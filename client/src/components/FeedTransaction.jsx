@@ -13,19 +13,18 @@ const FeedTransaction = (props) => {
         leftAvatar={<Avatar src={props.transaction.payer.avatarUrl || '/images/no-image.gif'} />}
         primaryText={
           <span>
-            {if (props.transaction.request === 'pending') {
-                <span>
+            {props.transaction.request === 'pending' ?  
+                (<span>
                   <span className='feed-item-user'><Link to={`/${props.transaction.payer.username}`}>{props.transaction.payer.fullName}</Link></span> sent <span className='feed-item-user'><Link to={`/${props.transaction.payee.username}`}>{props.transaction.payee.fullName}</Link></span> a payment request for ${+props.transaction.amount.replace(/-*/g,'')}. {props.transaction.private ? '(private)' : ''}
-                </span>
-              } else if (props.trans.request === 'declined') {
-                <span>
+                </span>)
+                : props.trans.request === 'declined' ?
+                (<span>
                   <span className='feed-item-user'><Link to={`/${props.transaction.payer.username}`}>{props.transaction.payer.fullName}</Link></span> has declined <span className='feed-item-user'><Link to={`/${props.transaction.payee.username}`}>{props.transaction.payee.fullName}</Link></span>'s payment request {props.transaction.private ? '(private)' : ''}
-                </span>
-              } else {
+                </span>)
+                : (
                 <span>
                   <span className='feed-item-user'><Link to={`/${props.transaction.payer.username}`}>{props.transaction.payer.fullName}</Link></span> paid <span className='feed-item-user'><Link to={`/${props.transaction.payee.username}`}>{props.transaction.payee.fullName}</Link></span> {props.transaction.private ? '(private)' : ''}
-                </span>
-              }
+                </span>)
             }
             <p className='feed-item-note'>{props.transaction.note}</p>
           </span>
