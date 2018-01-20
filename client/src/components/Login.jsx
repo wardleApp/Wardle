@@ -61,7 +61,7 @@ class Login extends React.Component {
               name='password'
               errorText={this.props.errorMessage}
               />
-            <br />
+            <br/>
             <br/>
             <button className='btn' onClick={this.onClickLoginButton.bind(this)}>Log In</button>
             <br/>

@@ -9,56 +9,38 @@ import { TextValidator} from 'react-material-ui-form-validator';
 class SignUp extends React.Component {
   constructor (props) {
     super(props);
-    this.state = {
-      formData: {
-        username: '',
-        email: '',
-        firstName: '',
-        lastName: '',
-        phone: '',
-        password: '',
-        avatarUrl: '',
-      },
-      submitted: false,
-      didSignupFail: false,
-      errorCode: null
-    }
   }
 
-
-  handleInputChanges (event) {
-    const { formData } = this.state;
-    formData[event.target.name] = event.target.value;
-    this.setState({ formData });
-  }
 
   signUserUp() {
-    this.setState({ submitted: true }, () => {
-        setTimeout(() => this.setState({ submitted: false }), 5000);
+    this.props.dispatch(actionSignUpSubmitted);// Will have to write a dispatch for this
+    setTimeout(() => this.props.dispatch(actionSignUpSubmitted), 5000);
     });
     
-    let user = this.state.formData;
+
+    let user = {
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        phone: document.getElementById('phone').value,
+        password: document.getElementById('password').value,
+        avatarUrl: document.getElementById('avatarUrl').value
+        }
 
     axios.post('/signup', user)
       .then((response) => {
         let userId = response.data.userId;
-        this.props.logUserIn(userId);
-        // <Redirect to="/" push/>
+        this.props.dispatch(actionLogUserIn(userId));
         this.props.history.push('/');
       })
       .catch((error) => {
         if (error.response && error.response.status === 422) {
           console.log('error authenticating user errors', error.response)
-          this.setState({
-            didSignupFail: true,
-            errorCode: 422
-          })
+          this.props.dispatch(actionSignUpAuthError())
         } else {
           console.log('Error in component', error.response)
-          this.setState({
-            didSignupFail: true,
-            errorCode: 500
-          })   
+          this.props.dispatch(actionSignUpComponentError())
         }
       });
   }
@@ -88,48 +70,54 @@ class SignUp extends React.Component {
             >
               <TextValidator
                 floatingLabelText="Username"
-                onChange={this.handleInputChanges.bind(this)}
+                // onChange={this.handleInputChanges.bind(this)}
                 name="username"
+                id="username"
                 value={formData.username}
                 validators={['required', 'isString', 'minStringLength:4', 'maxStringLength:20']}
                 errorMessages={['this field is required', 'invalid input', 'must be at least 4 character', 'must not excede 20 characters']}
               /><br/>
               <TextValidator
                 floatingLabelText="First Name"
-                onChange={this.handleInputChanges.bind(this)}
+                // onChange={this.handleInputChanges.bind(this)}
                 name="firstName"
+                id="firstName"
                 value={formData.firstName}
                 validators={['required', 'isString', 'minStringLength:1', 'maxStringLength:20']}
                 errorMessages={['this field is required', 'invalid input', 'this field is required', 'must not excede 20 characters']}
               /><br/>
               <TextValidator
                 floatingLabelText="Last Name"
-                onChange={this.handleInputChanges.bind(this)}
+                // onChange={this.handleInputChanges.bind(this)}
                 name="lastName"
+                id="lastName"
                 value={formData.lastName}
                 validators={['required', 'isString', 'minStringLength:1', 'maxStringLength:20']}
                 errorMessages={['this field is required', 'invalid input', 'this field is required', 'must not excede 20 characters']}
               /><br/>
               <TextValidator
                 floatingLabelText="Email Address"
-                onChange={this.handleInputChanges.bind(this)}
+                // onChange={this.handleInputChanges.bind(this)}
                 name="email"
+                id="email"
                 value={formData.email}
                 validators={['required', 'isEmail', 'minStringLength:7', 'maxStringLength:64']}
                 errorMessages={['this field is required', 'not a valid email address', 'must enter a unique email address', 'must not excede 64 characters']}
               /><br/>
               <TextValidator
                 floatingLabelText="Phone Number"
-                onChange={this.handleInputChanges.bind(this)}
+                // onChange={this.handleInputChanges.bind(this)}
                 name="phone"
+                id="phone"
                 value={formData.phone}
                 validators={['required', 'isNumber', 'minStringLength:10', 'maxStringLength:11']}
                 errorMessages={['this field is required', 'not a valid phone number', 'example: 7895551234', 'must not excede 11 characters']}
               /><br/>
               <TextValidator
                 floatingLabelText="Password"
-                onChange={this.handleInputChanges.bind(this)}
+                // onChange={this.handleInputChanges.bind(this)}
                 name="password"
+                id="password"
                 type="password"
                 value={formData.password}
                 validators={['required', 'isString', 'minStringLength:4', 'maxStringLength:64']}
@@ -137,8 +125,9 @@ class SignUp extends React.Component {
               /><br/>
               <TextValidator
                 floatingLabelText="Re-enter password"
-                onChange={this.handleInputChanges.bind(this)}
+                // onChange={this.handleInputChanges.bind(this)}
                 name="repeatPassword"
+                id="repeatPassword"
                 type="password"
                 value={formData.repeatPassword}
                 validators={['required', 'isPasswordMatch']}
@@ -146,9 +135,10 @@ class SignUp extends React.Component {
               /><br/>
               <TextValidator
                 floatingLabelText="Avatar URL (Optional)"
-                onChange={this.handleInputChanges.bind(this)}
+                // onChange={this.handleInputChanges.bind(this)}
                 value={formData.avatarUrl}
                 name="avatarUrl"
+                id="avatarUrl"
               /><br/>
             <div>
               <button className='btn' onClick={this.signUserUp.bind(this)}>Create Account</button>
@@ -174,4 +164,18 @@ class SignUp extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    userInfo: state.userInfo,
+    isLoggedIn: state.isLoggedIn,      
+    submitted: state.submitted,
+    didSignupFail: state.didSignupFail,
+    errorCode: state.errorCode 
+    actionLogUserIn,
+    actionGetUserInfo,
+    actionSignUp
+  };
+}
+
 export default SignUp;

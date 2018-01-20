@@ -131,20 +131,6 @@ class App extends React.Component {
       });
   }
 
-// <<<<<<< HEAD
-// =======
-//   getFriendsList(userId) {
-//     axios('/friends', { params: { userId: userId } })
-//       .then((response) => {
-//         console.log('response', response.data)
-//         this.props.dispatch('dispatch action here', response.data));
-//       })
-//       .catch((err) => {
-//         console.error(err);
-//       });
-//   }
-
-// >>>>>>> pre rebase
 
   logUserIn(userId) {
      // set the userId in the userInfo object as soon as the user logs in
