@@ -8,6 +8,13 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Checkbox from 'material-ui/Checkbox';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
+import {connect} from 'react-redux';
+import {paymentGetUsernames,
+        paymentInputOnChange,
+        paymentDropDown,
+        paymentTogglePrivate,
+        paymentPayUser,
+        paymentError} from '../actions/paymentActions.js';
 
 const style = {
   form: {
@@ -29,24 +36,10 @@ const style = {
 }
 
 class Payment extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = {
-      payeeUsername: '',
-      amount: '',
-      note: '',
-      paymentFail: false,
-      usernames: [],
-      private: false
-    }
-  }
-
   componentDidMount() {
-    axios('/usernames', { params: { userId: this.props.payerId }})
+    axios('/usernames', { params: { userId: this.props.userInfo.payerId }})
     .then(response => {
-      this.setState({
-        usernames: response.data.usernames
-      });
+      this.props.dispatch(paymentGetUsernames(response.data.usernames));
     })
     .catch(err => {
       console.error(err);
@@ -55,44 +48,35 @@ class Payment extends React.Component {
 
   handleInputChanges (event) {
     let target = event.target;
-    this.setState({
-      [target.name] : target.value
-    })
+    var obj = {
+      name: target.name,
+      value: target.value
+    }
+    this.props.dispatch(paymentInputOnChange(obj));
   }
 
   onDropdownInput(searchText) {
-    this.setState({
-      payeeUsername: searchText
-    })
+    this.props.dispatch(paymentDropDown(searchText));
   }
 
   setPrivate () {
-    this.setState({
-      private: !this.state.private
-    })
+    this.props.dispatch(paymentTogglePrivate());
   }
 
   payUser() {
     let payment = {
       payerId: this.props.payerId,
-      payeeUsername: !this.state.payeeUsername ? this.props.payeeUsername : this.state.payeeUsername,
-      amount: this.state.amount,
-      note: this.state.note,
-      private: this.state.private,
-      request: +this.state.amount < 0,
-      pending: +this.state.amount < 0
+      payeeUsername: this.props.payeeUsername,
+      amount: this.props.amount,
+      note: this.props.note,
+      private: this.props.private || false,
+      request: +this.props.amount < 0 ? 'pending' : undefined,
     };
     axios.post('/pay', payment)
       .then((response) => {
-        this.setState({
-          payeeUsername: '',
-          amount: '',
-          note: '',
-          private: false,
-          paymentFail: false
-        });
-        this.props.refreshUserData(this.props.payerId);
-        this.props.getHistory(this.props.payerId);
+        this.props.dispatch(paymentPayUser());
+        this.props.refreshUserData(this.props.userInfo.payerId);
+        this.props.getHistory(this.props.userInfo.payerId);
       })
       .catch(error => {
         if (error.response) {
@@ -114,37 +98,32 @@ class Payment extends React.Component {
         } else {
           console.error('Error in payment component:', error);
         }
-        this.setState({
-          paymentFail: true
+        this.props.dispatch(paymentError());
         });
-      })
-  }
-
+      }
   render() {
     return (
       <Paper className='payment-container' style={style.form}>
         <div className='payment-item-container'>
-            {!this.props.payeeUsername &&
-              <div className="form-box payment-username">
-                <AutoComplete
-                  hintText="Enter a username"
-                  floatingLabelText="To:"
-                  style={style.input}
-                  name='payeeUsername'
-                  filter={AutoComplete.caseInsensitiveFilter}
-                  dataSource={this.state.usernames ? this.state.usernames : []}
-                  maxSearchResults={7}
-                  searchText={this.state.payeeUsername}
-                  onUpdateInput = {this.onDropdownInput.bind(this)}
-                />
-              </div>
-            }
+          <div className="form-box payment-username">
+            <AutoComplete
+              hintText="Enter a username"
+              floatingLabelText="To:"
+              style={style.input}
+              name='payeeUsername'
+              filter={AutoComplete.caseInsensitiveFilter}
+              dataSource={this.props.usernames || []}
+              maxSearchResults={7}
+              searchText={this.props.payeeUsername}
+              onUpdateInput = {this.onDropdownInput.bind(this)}
+            />
+          </div>
           <br />
           <div className="form-box payment-amount">
             <TextField
               style={style.input}
               name='amount'
-              value={this.state.amount}
+              value={this.props.amount}
               onChange = {this.handleInputChanges.bind(this)}
               hintText="Enter an amount"
               floatingLabelText="$"
@@ -155,7 +134,7 @@ class Payment extends React.Component {
             <TextField
               style={style.input}
               name='note'
-              value={this.state.note}
+              value={this.props.note}
               onChange = {this.handleInputChanges.bind(this)}
               hintText="for"
               floatingLabelText="Leave a comment"
@@ -167,14 +146,14 @@ class Payment extends React.Component {
         </div>
         <div>
           <button className='btn' onClick={this.payUser.bind(this)}>Pay</button>
-          {this.state.paymentFail
+          {this.props.paymentFail
             ? <label className='error-text'>
             Error in payment processing
           </label>
           : null
           }
           <Checkbox className='payment-private'
-            checked={this.state.private}
+            checked={this.props.private}
             checkedIcon={<VisibilityOff />}
             uncheckedIcon={<Visibility />}
             onClick={this.setPrivate.bind(this)}
@@ -186,4 +165,25 @@ class Payment extends React.Component {
   }
 }
 
-export default Payment;
+const mapStateToProps = (state) => {
+  return {
+    userInfo: state.userInfo,
+    usernames: state.usernames,
+    payeeUsername: state.payeeUsername,
+    note: state.note,
+    amount: state.amount,
+    paymentFail: state.paymentFail,
+    private: state.private
+  }
+};
+
+const mapDispatchToProps = {
+  paymentGetUsernames,
+  paymentInputOnChange,
+  paymentDropDown,
+  paymentTogglePrivate,
+  paymentPayUser,
+  paymentError
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Payment);

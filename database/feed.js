@@ -24,7 +24,6 @@ const formatOutput = (item, userId) => {
     timestamp: formattedDate,
     private: item.private,
     request: item.request,
-    pending: item.pending,
     payer: {
       userId: item.payer_id,
       username: item.payer_username,
@@ -52,7 +51,6 @@ const FEED_FIELDS = ['transactions.txn_id',
   'transactions.created_at',
   'transactions.private',
   'transactions.request',
-  'transactions.pending',
   {payer_id: 'users_transactions.payer_id'},
   {payer_firstName: 'payer.first_name'},
   {payer_username: 'payer.username'},
@@ -178,7 +176,7 @@ module.exports = {
     return pg('transactions')
     .where('txn_id', '=', id)
     .update({
-      pending: false
+      request: 'declined'
     }).then(result => {
       return result;
     });
@@ -186,8 +184,10 @@ module.exports = {
   deleteRequest: (id) => {
     return pg('transactions')
     .where('txn_id', '=', id)
-    .del().then(results => {
-      return results;
-    })
+    .update({
+      request: undefined
+    }).then(result => {
+      return result;
+    });
   }
 };
