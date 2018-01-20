@@ -6,6 +6,7 @@ var nodeMailer = require('./nodemailer.js');
 const saltRounds = 10;
 
 router.post('/enable2factorauth', (req, res) => {
+	console.log('THIS IS OUR CURRENT AUTH', req.body.currentAuth)
 	dbProfile.toggleTwoFactorAuth(req.body.username, req.body.currentAuth)
 	.then((result) => {
 		if(result) {
@@ -38,6 +39,13 @@ router.post('/twoFactorAuthCompare', (req, res) => {
 	} else {
 		res.status(201);
 	}
+})
+
+router.post('/processOffer', (req, res) => {
+	dbProfile.getProfileDataByUsername(req.body.username)
+	.then((data) => {
+		res.status(201).json(data);
+	})
 })
 
 exports.router = router;

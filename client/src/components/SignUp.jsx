@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import NavBar from './Navbar.jsx';
 import FlatButton from 'material-ui/FlatButton';
 import { ValidatorForm } from 'react-form-validator-core';
@@ -48,6 +48,7 @@ class SignUp extends React.Component {
       .then((response) => {
         let userId = response.data.userId;
         this.props.logUserIn(userId);
+        // <Redirect to="/" push/>
         this.props.history.push('/');
         
       })

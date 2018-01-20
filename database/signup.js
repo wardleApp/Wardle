@@ -1,4 +1,6 @@
 const pg = require('./index.js').pg;
+const bcrypt = require('bcrypt');
+const saltGen = 8;
 
 const newUserSignup = function(signupData, startingAmount) {
   let userId = undefined;
@@ -11,7 +13,7 @@ const newUserSignup = function(signupData, startingAmount) {
       first_name: signupData.firstName,
       last_name: signupData.lastName,
       // TODO: hash password upon insertion
-      password: signupData.password,
+      password: bcrypt.hashSync(signupData.password, saltGen), 
       phone: signupData.phone,
       email: signupData.email,
       avatar_url: signupData.avatarUrl ? signupData.avatarUrl : null

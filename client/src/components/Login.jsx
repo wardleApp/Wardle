@@ -1,11 +1,11 @@
 import React from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+axios.defaults.withCredentials = true;
+import { Link, Redirect } from 'react-router-dom';
 import NavBar from './Navbar.jsx';
 import TwoFactorAuth from './TwoFactorAuth.jsx';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
-
 
 class Login extends React.Component {
   constructor (props) {
@@ -61,6 +61,7 @@ class Login extends React.Component {
       } else {
         let userId = response.data.userId;
         this.props.logUserIn(userId);
+        // <Redirect to="/" push/>
         this.props.history.push('/');
       }
     })

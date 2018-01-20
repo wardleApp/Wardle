@@ -69,7 +69,7 @@ class Payment extends React.Component {
   setPrivate () {
     this.setState({
       private: !this.state.private
-    }, console.log('privacy is now', !this.state.private))
+    })
   }
 
   payUser() {
@@ -78,7 +78,9 @@ class Payment extends React.Component {
       payeeUsername: !this.state.payeeUsername ? this.props.payeeUsername : this.state.payeeUsername,
       amount: this.state.amount,
       note: this.state.note,
-      private: this.state.private
+      private: this.state.private,
+      request: +this.state.amount < 0,
+      pending: +this.state.amount < 0
     };
     axios.post('/pay', payment)
       .then((response) => {
@@ -90,6 +92,7 @@ class Payment extends React.Component {
           paymentFail: false
         });
         this.props.refreshUserData(this.props.payerId);
+        this.props.getHistory(this.props.payerId);
       })
       .catch(error => {
         if (error.response) {
@@ -102,6 +105,10 @@ class Payment extends React.Component {
               break;
             case 400:
               console.error('BAD REQUEST:', error.response);
+              break;
+            case 403:
+              this.props.logUserOut();
+              alert('User has session has timed out.');
               break;
           }
         } else {

@@ -85,8 +85,12 @@ class Profile extends React.Component {
         }
       })
       .catch((err) => {
+        if (err.response && err.response.status === 403) {
+          this.props.logUserOut();
+          alert('User has session has timed out.');
+        }
         console.error(err);
-      }); 
+      });
   }
 
   loadProfileData(username) {
@@ -100,6 +104,10 @@ class Profile extends React.Component {
         this.setState({
           unknownUser: true
         })
+        if (err.response && err.response.status === 403) {
+          this.props.logUserOut();
+          alert('User has session has timed out.');
+        }
         console.error(err);
       });
   }
@@ -124,24 +132,24 @@ class Profile extends React.Component {
         data: this.state.relationalFeed
       }
     ];
-    
-    // For a user's own profile page, only show a single feed 
+
+    // For a user's own profile page, only show a single feed
     if (this.props.userInfo.username === this.props.match.params.username) {
       orderedFeeds = orderedFeeds.slice(0, 1);
       orderedFeeds[0].displayLabel = 'Your Feed';
     }
-    
+
     return (
       <div>
-        <Navbar 
-          isLoggedIn={this.props.isLoggedIn} 
+        <Navbar
+          isLoggedIn={this.props.isLoggedIn}
           logUserOut={this.props.logUserOut} />
         <div className='body-container'>
-          {this.state.unknownUser 
-            ? <div>User does not exist</div> 
-            : !this.state.profileInfo.twofactor ? <div></div> 
+          {this.state.unknownUser
+            ? <div>User does not exist</div>
+            /*: !this.state.profileInfo.twofactor ? <div></div> */
             : <div className='pay-feed-container'>
-              <ProfileHeader profileInfo={this.state.profileInfo} twoFactorAuthToggle={this.props.twoFactorAuthToggle}/>
+              <ProfileHeader profileInfo={this.state.profileInfo} twoFactorAuthToggle={this.props.twoFactorAuthToggle} loadProfileData={this.loadProfileData.bind(this)}/>
               {this.props.userInfo.username !== this.props.match.params.username
                 ? <Payment
                     refreshUserData={this.props.refreshUserData}
@@ -151,7 +159,7 @@ class Profile extends React.Component {
                 :
                   null
               }
-              <FeedContainer       
+              <FeedContainer
                 userId={this.props.userInfo.userId}
                 loadMoreFeed={this.loadMoreFeed.bind(this)}
                 feeds={orderedFeeds}

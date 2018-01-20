@@ -1,42 +1,3 @@
-//======= TOKEN GENERATOR =======//
-
-const fruits = ["guava", "mango", "kiwi", "melon", "banana"];
-
-const random = function(array) {
-  let index = Math.floor(Math.random() * array.length)
-  return array[index];
-};
-
-const hash = function(username, max) {
-  let hash = 0;
-
-    for (var i = 0; i < username.length; i++) {
-      hash = (hash << 5) + hash + username.charCodeAt(i);
-      hash = hash & hash; // Convert to 32bit integer
-      hash = Math.abs(hash);
-    }
-
-    return hash % max;
-};
-
-const max = function(fruit) {
-  let max = "";
-  
-  for (let a = 0; a < 12 - fruit.length; a++) {
-    max += 9;
-  }
-  
-  return max;
-}
-
-const generateToken = function(username) {
-  let fruit = random(fruits);
-  let token = fruit + hash(username, max(fruit) );
-
-  return token;
-};
-
-//===============================//
 
 module.exports = {
   buildFeedObject: (items, limit) => {
@@ -54,7 +15,14 @@ module.exports = {
     }
 
     return results;
-  },
+  }, 
 
-  generateToken : generateToken
+  // middleware function to check for logged-in users
+  // sessionChecker: (req, res, next) => {
+  //   if (req.session.user && req.cookies.user_sid) {
+  //       res.redirect('/');
+  //   } else {
+  //       next();
+  //   }    
+  // }
 }

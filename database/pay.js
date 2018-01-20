@@ -1,6 +1,15 @@
 const pg = require('./index.js').pg;
 
 const pay = function(paymentDataFromServer) {
+  console.log(paymentDataFromServer);
+  // { payerId: '3',
+  // payeeUsername: 'test',
+  // amount: '-10',
+  // note: 'zcxvadf',
+  // private: 'false',
+  // request: 'true',
+  // pending: 'true'}
+
   let localPaymentInfo = {
     payerBalance: undefined,
     payeeBalance: undefined,
@@ -25,16 +34,21 @@ const pay = function(paymentDataFromServer) {
       })
       // add to the transactions table with txn_id
       .then(txn_id => {
-        return Promise.all([
-          addTransaction(paymentTransaction, txn_id, paymentDataFromServer),
-          updatePayerBalance(paymentTransaction, paymentDataFromServer, localPaymentInfo),
-          updatePayeeBalance(paymentTransaction, paymentDataFromServer, localPaymentInfo)
-        ])
+        if (paymentDataFromServer.request === 'true') {
+          return addTransaction(paymentTransaction, txn_id, paymentDataFromServer);
+        } else {
+          return Promise.all([
+            addTransaction(paymentTransaction, txn_id, paymentDataFromServer),
+            updatePayerBalance(paymentTransaction, paymentDataFromServer, localPaymentInfo),
+            updatePayeeBalance(paymentTransaction, paymentDataFromServer, localPaymentInfo)
+          ])
+        }
       })
       // commit
       .then(paymentTransaction.commit)
       // return the payer's balance
       .then(() => {
+        console.log('end');
         res(localPaymentInfo.payerBalance);
       })
       .catch(err => {
@@ -82,7 +96,9 @@ const addTransaction = function(paymentTransaction, txn_id, paymentDataFromServe
     txn_id: parseInt(txn_id[0]),
     amount: parseFloat(paymentDataFromServer.amount).toFixed(2),
     note: paymentDataFromServer.note,
-    private: paymentDataFromServer.private
+    private: paymentDataFromServer.private,
+    request: paymentDataFromServer.request,
+    pending: paymentDataFromServer.pending
   })
 }
 

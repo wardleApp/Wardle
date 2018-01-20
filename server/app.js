@@ -1,12 +1,28 @@
 const express = require('express');
+const cors = require('cors');
+const bcrypt = require('bcrypt');
 const app = express();
 const bodyParser = require('body-parser');
 const db = require('../database/queries.js');
 const helpers = require('./helpers.js');
+const session = require('express-session');
+const morgan = require('morgan');
 var path = require('path');
 const _ = require('underscore');
+
+/* Dillon Experimental Routes */
 const dillonRoutes = require('./dillonRoutes.js');
-const morgan = require('morgan');
+const index = require('./index.js');
+/* Dillon Experimental Routes */
+
+//for sending emails
+const sgMail = require('@sendgrid/mail');
+
+// A for allowing cookie sending
+app.use(cors({ 
+    origin: "localhost:3000",
+    credentials: true
+}))
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,95 +30,57 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
 app.use(bodyParser.json());
 
-// logs all api requests, tiny is the default
-// morgan is useful for testing, but could slow things down
-// disable it before deployment there are ways to set this as a condition
-app.use(morgan("tiny")); 
-
 app.use(express.static(__dirname + '/../client/dist'));
 
 // DILLON'S ROUTES
 app.use('/dillon', dillonRoutes.router);
 
+// Turn on dev type logging
+app.use(morgan('dev'));
 
+// initialize express-session to allow us track the logged-in user across sessions.
+app.use(session({
+    key: 'user_sid',
+    secret: 'allthesecrets',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: 60000,
+        path: '/login',
+        secure: false
+    }
+}));
 
-//==================================//
-//======= EMAIL INVITATION =========//
-//==================================//
-
-//for sending emails
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey('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');
-
-app.get("/invite", function(req, res) {
-
-  console.log("router received invite request");
-
-  let token = "guava0001";
-  let link = "https://wardle.herokuapp.com/signup";
-
-  let sender = "Wardle";
-  let recipient = "Nuno";
-
-  let subject = "Wardle welcomes you.";
-  let text = `Greetings, ${recipient}. \n ${sender} has invited you to the future of peer payment. \n \n Sign up on ${link} and use the following token to give your friend a Jackson: \n ${token} \n\n With Love, \n Wardle`;
-
-  const msg = {
-    to: 'youknownuno@gmail.com',
-    from: 'wardleapp@gmail.com',
-    subject: subject,
-    text: text,
-    html: `<strong>${text}</strong>`,
-  };
-
-  console.log("MESSAGE ========== ", msg); // should display on server
-
-  sgMail.send(msg);
-
-  res.status(200).send(msg); // new syntax
-
-});
-
-//==================================//
-
-// rewarding author of referral with the token
-app.post('/reward', function(req, res) {
-  let token = req.body.token;
-  console.log("token received from axios = ", token);
-  db.reward(token);
-  res.status(201).send("token processed");
-});
-
-
-//find token by user
-app.get('/findToken', function(req, res) {
-  let username = req.body.username;
-  db.findTokenByUser(username, function(token) {
-    console.log(`token found for username ${username} = ${token}`);
-    res.status(201).send(token);
-  });
-  
-});
 
 app.post('/login', (req, res) => {
+  let session = req.session;
   var {username, password} = req.body;
+
   db.getPasswordAtUsername(_.escape(username.replace(/"/g,"'")), (err, row) => {
     if (err) {
       console.error("Error retrieving from database: ", err);
       res.status(500).json(err);
     } else {
       if (row.length) {
-        if (row[0].password === password) {
+        if (bcrypt.compareSync(password, row[0].password)) {
+          session.userId = row[0].id
+          res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
           res.status(200).json({ userId: row[0].id, twofactor: row[0].twofactor, password: row[0].password});
         } else {
           res.status(401).json({ error : "Incorrect password"});
         }
-      } else{
+      } else {
         res.status(401).json({ error : "Invalid username"});
       }
     }
   });
 });
+
+
+app.get('/logout', (req, res) => {
+  console.log('Cookie destroyed');
+  res.clearCookie("session-cookie").sendStatus(200);
+})
 
 app.get('/usernames', (req, res) => {
   db.getUsernames(parseInt(_.escape(req.query.userId)))
@@ -119,7 +97,13 @@ app.get('/usernames', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
-  console.log("request to /profile = ", req.query.userId); //query is empty
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
 
   var userId = req.query.userId;
   db.profile.getUserInfo(parseInt(_.escape(userId.replace(/"/g,"'"))), (err, row) => {
@@ -145,6 +129,7 @@ app.get('/profile', (req, res) => {
 });
 
 app.get('/balance', (req, res) => {
+
   var userId = req.query.userId;
   db.profile.getBalance(parseInt(_.escape(userId.replace(/"/g,"'"))), (err, row) => {
     if (err) {
@@ -175,31 +160,13 @@ app.post('/signup', (req, res) => {
   for(let key in req.body) {
     signupData[_.escape(key.replace(/"/g,"'"))] = _.escape(req.body[key].replace(/"/g,"'"));
   }
-
-    console.log("signup token will be created here");
-
-    signupData.token = helpers.generateToken(signupData.username);
-
-    console.log("SignUpData created: ", signupData);
-    console.log(`token created for username ${req.body.username} = ${signupData.token}`)
-
-
-  
-
   db.signup.newUserSignup(signupData, 100)
-    
-    /* was:
     .then(userId => {
--      res.status(201).json({ userId: userId });
-    */
-    .then(function() {
-      db.insertToken( req.body.username, signupData.token)
-      .then(function() {
-        res.status(201).send("token and user created");
-      })
 
+      // Initiate inital cookie on successful sign up
+      res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+      res.status(201).json({ userId: userId });
     })
-    
     .catch(err => {
       console.error('error on user signup:', err.message);
       // TODO: send responses depending on what type of error is thrown
@@ -213,13 +180,18 @@ app.post('/signup', (req, res) => {
         res.status(400).json({ error: "Improper format." });
       }
     })
-
-
-
 })
 
 app.post('/pay', (req, res) => {
   // TODO: check if user is still logged in (i.e. check cookie) here. If not, send back appropriate error response.
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let paymentData = {};
   for(let key in req.body) {
     paymentData[_.escape(key.replace(/"/g,"'"))] = _.escape(req.body[key].toString().replace(/"/g,"'"));
@@ -247,6 +219,15 @@ app.post('/pay', (req, res) => {
 
 
 app.get('/publicprofile', (req, res) => {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
+
   let username = req.query.username;
   username = username && _.escape(username.replace(/"/g,"'"));
 
@@ -279,6 +260,14 @@ app.get('/publicprofile', (req, res) => {
 const FEED_DEFAULT_LENGTH = 5;
 
 app.get('/feed/global', (req, res) => {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let limit = FEED_DEFAULT_LENGTH;
   let userId = req.query && parseInt(req.query.userId);
   let beforeId = parseInt(req.query['beforeId']) || null;
@@ -296,6 +285,14 @@ app.get('/feed/global', (req, res) => {
 });
 
 app.get('/feed/all', (req, res) => {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let userId = parseInt(req.query.userId);
   db.allFeed(userId)
     .then((results) => {
@@ -309,12 +306,19 @@ app.get('/feed/all', (req, res) => {
 });
 
 app.get('/feed/user/:userId', (req, res) => {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let userId = req.params && parseInt(req.params.userId);
 
   let limit = FEED_DEFAULT_LENGTH;
   let beforeId = parseInt(req.query['beforeId']) || null;
   let sinceId = parseInt(req.query['sinceId']) || null;
-
   if (isNaN(userId)) {
     res.sendStatus(400).json({ error: "Improper format." });
     return;
@@ -332,6 +336,14 @@ app.get('/feed/user/:userId', (req, res) => {
 });
 
 app.get('/feed/profile', (req, res) => {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let profileUsername = req.query.profileUsername;
   let loggedInUserId = req.query && parseInt(req.query.userId);
 
@@ -353,10 +365,17 @@ app.get('/feed/profile', (req, res) => {
 });
 
 app.get('/feed/relational', (req, res) => {
+  if (!req.headers.cookie.includes('session-cookie=loggedIn')) {
+    res.status(403).json({ error: 'User logged out for security reasons'});
+    return;
+  }
+
+  // Refresh the cookie timer
+  res.cookie('session-cookie', 'loggedIn', { maxAge: 180000 });
+
   let profileUsername = req.query.profileUsername;
   let loggedInUserId = req.query && parseInt(req.query.userId);
   profileUsername = profileUsername && _.escape(profileUsername.replace(/"/g,"'"));
-
   let limit = FEED_DEFAULT_LENGTH;
   let beforeId = parseInt(req.query['beforeId']) || null;
   let sinceId = parseInt(req.query['sinceId']) || null;
@@ -376,11 +395,59 @@ app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '..' , './client/dist/index.html'));
 });
 
+app.patch('/request', (req, res) => {
+  db.updateRequest(req.body.transactionId)
+    .then((results) => {
+      res.status(201).json();
+    }).catch(err => {
+      console.error('error updating pending status', err);
+      res.sendStatus(500).json({error: 'server error'});
+    })
+});
+
+app.post('/request', (req, res) => {
+  console.log(req.body);
+  db.deleteRequest(req.body.transactionId)
+    .then((results) => {
+      res.status(200).json();
+    }).catch(err => {
+      console.error('error deleting request', err);
+      res.sendStatus(500).json({error: 'server error'});
+    })
+});
+
+//==================================//
+//======= EMAIL INVITATION =========//
+//==================================//
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+var router = express.Router();
+
+router.get("/invite", function(req, res) {
+
+  let token = "guava0001";
+  let link = "https://wardle.herokuapp.com/signup";
+
+  let sender = "Jackie Jou";
+  let recipient = "Nuno Neves";
+
+  let subject = "Wardle welcomes you.";
+  let text = `Greetings, ${recipient}. \n ${sender} has invited you to the future of peer payment. \n \n Sign up on ${link} and use the following token to give your friend a Jackson: \n ${token} \n\n With Love, \n Wardle`;
+
+  const msg = {
+    to: 'youknownuno@example.com',
+    from: 'joujackie@example.com',
+    subject: subject,
+    text: text,
+    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+  };
+
+  sgMail.send(msg);
+});
 
 // test this on:
 // https://app.sendgrid.com/guide/integrate/langs/nodejs/verify
 
 //==================================//
-
-
 module.exports = app;

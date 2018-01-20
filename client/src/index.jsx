@@ -1,15 +1,16 @@
 // ---------- Packages ---------- //
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom'
 import $ from 'jquery';
 import axios from 'axios';
+import io from "socket.io-client";
 
 // ---------- Material UI ---------- //
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
-// ---------- Componenets ---------- //
+// ---------- Components ---------- //
 import LoggedOutHome from './components/LoggedOutHome.jsx';
 import Home from './components/Home.jsx';
 import Login from './components/Login.jsx';
@@ -34,7 +35,8 @@ class App extends React.Component {
       userFeed: {},
       balance: null,
       userInfo: {}
-    }
+    };
+    this.socket = io('http://127.0.0.1:3000/');
   }
 
   loadUserData(userId) {
@@ -140,8 +142,8 @@ class App extends React.Component {
     var obj = this.state.userInfo;
     obj.userId = userId;
     this.setState({
-      isLoggedIn: true, 
-      userInfo: obj
+      isLoggedIn: true,
+      userInfo: obj, 
     })
     this.loadUserData(userId);
   }
@@ -153,6 +155,13 @@ class App extends React.Component {
       userFeed: {},
       balance: null,
       userInfo: {}
+    })
+    axios('/logout')
+    .then((response) => {
+      console.log('Logout success');
+    })
+    .catch((err) => {
+      console.log('Logout unsuccesful');
     })
   }
 
@@ -179,6 +188,8 @@ class App extends React.Component {
                 globalFeed={this.state.globalFeed}
                 userInfo={this.state.userInfo}
                 balance={this.state.balance}
+                cookie={this.state.cookie}
+                socket={this.socket}
                 {...props}
               />
           }
@@ -202,6 +213,7 @@ class App extends React.Component {
                 logUserOut={this.logUserOut.bind(this)}
                 userInfo={this.state.userInfo}
                 twoFactorAuthToggle={this.twoFactorAuthToggle.bind(this)}
+                cookie={this.state.cookie}
                 {...routeProps} 
               />
           }
