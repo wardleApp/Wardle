@@ -103,5 +103,4 @@ class Requests extends React.Component {
   }
 }
 
-
-export default connect(mapStateToProps)(Requests);
+export default Requests;
