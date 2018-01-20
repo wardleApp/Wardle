@@ -6,12 +6,14 @@ import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom'
 import LoggedOutHome from './components/LoggedOutHome.jsx';
 import Home from './components/Home.jsx';
 import Login from './components/Login.jsx';
+import reducer from './reducers/index.jsx';
+import { createStore } from 'redux';
 
 // // ---------- Material UI ---------- //
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
-const store = configureStore();
+const store = createStore(reducer);
 
 const muiTheme = getMuiTheme({
   palette: {

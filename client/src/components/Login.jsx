@@ -1,13 +1,18 @@
 import React from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux'
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, withRouter } from 'react-router-dom';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
+import { actionAttemptLogin } from '../actions/loginAttempt.jsx';
 
 class Login extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
+  }
+
+  componentDidMount() {
+    this.props.dispatch(actionAttemptLogin());
   }
 
   render() {
@@ -24,6 +29,7 @@ class Login extends React.Component {
           <br/>
           <br/>
           <div>
+          {console.log('this', this)}
             <span>Don't have an account? <br/>Create one!</span>
             <br/>
             <Link to="/signup">
@@ -36,13 +42,14 @@ class Login extends React.Component {
   }
 }
 
-const theseProps = (state) => {
+let mapStateToProps = state => {
   return {
-    isLoggedIn: state.isLoggedIn
+    isLoggedIn: state.isLoggedIn,
+    actionAttemptLogin
   }
 }
 
-export default connect (theseProps)(Login);
+export default withRouter(connect(mapStateToProps)(Login));
 
 // import React from 'react';
 // import axios from 'axios';
