@@ -48,7 +48,7 @@
     "sendgrid": "^5.2.3",
     "socket.io": "^2.0.4",
     "underscore": "^1.8.3",
-    "webpack": "^2.7.0"
+    "webpack": "^2.2.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",
