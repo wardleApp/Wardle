@@ -26,6 +26,7 @@ import LoggedOutHome from './LoggedOutHome.jsx';
 import Home from './Home.jsx';
 import Profile from './Profile.jsx';
 import Navbar from './Navbar.jsx';
+import SignUp from './SignUp.jsx';
 
 // ---------- Helper ---------- //
 import feedManipulation from '../feedManipulation.js'
@@ -39,6 +40,8 @@ const muiTheme = getMuiTheme({
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.props.dispatch(actionInitialStates())
+    console.log(this.props);
   }
 
   loadUserData(userId) {

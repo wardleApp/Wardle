@@ -16,7 +16,6 @@ class SignUp extends React.Component {
   signUserUp() {
     this.props.dispatch(actionSignUpSubmitted);// Will have to write a dispatch for this
     setTimeout(() => this.props.dispatch(actionSignUpSubmitted), 5000);
-    });
     
 
     let user = {
@@ -74,7 +73,7 @@ class SignUp extends React.Component {
                 // onChange={this.handleInputChanges.bind(this)}
                 name="username"
                 id="username"
-                value={formData.username}
+                // value={formData.username}
                 validators={['required', 'isString', 'minStringLength:4', 'maxStringLength:20']}
                 errorMessages={['this field is required', 'invalid input', 'must be at least 4 character', 'must not excede 20 characters']}
               /><br/>
@@ -83,7 +82,7 @@ class SignUp extends React.Component {
                 // onChange={this.handleInputChanges.bind(this)}
                 name="firstName"
                 id="firstName"
-                value={formData.firstName}
+                // value={formData.firstName}
                 validators={['required', 'isString', 'minStringLength:1', 'maxStringLength:20']}
                 errorMessages={['this field is required', 'invalid input', 'this field is required', 'must not excede 20 characters']}
               /><br/>
@@ -92,7 +91,7 @@ class SignUp extends React.Component {
                 // onChange={this.handleInputChanges.bind(this)}
                 name="lastName"
                 id="lastName"
-                value={formData.lastName}
+                // value={formData.lastName}
                 validators={['required', 'isString', 'minStringLength:1', 'maxStringLength:20']}
                 errorMessages={['this field is required', 'invalid input', 'this field is required', 'must not excede 20 characters']}
               /><br/>
@@ -101,7 +100,7 @@ class SignUp extends React.Component {
                 // onChange={this.handleInputChanges.bind(this)}
                 name="email"
                 id="email"
-                value={formData.email}
+                // value={formData.email}
                 validators={['required', 'isEmail', 'minStringLength:7', 'maxStringLength:64']}
                 errorMessages={['this field is required', 'not a valid email address', 'must enter a unique email address', 'must not excede 64 characters']}
               /><br/>
@@ -110,7 +109,7 @@ class SignUp extends React.Component {
                 // onChange={this.handleInputChanges.bind(this)}
                 name="phone"
                 id="phone"
-                value={formData.phone}
+                // value={formData.phone}
                 validators={['required', 'isNumber', 'minStringLength:10', 'maxStringLength:11']}
                 errorMessages={['this field is required', 'not a valid phone number', 'example: 7895551234', 'must not excede 11 characters']}
               /><br/>
@@ -120,7 +119,7 @@ class SignUp extends React.Component {
                 name="password"
                 id="password"
                 type="password"
-                value={formData.password}
+                // value={formData.password}
                 validators={['required', 'isString', 'minStringLength:4', 'maxStringLength:64']}
                 errorMessages={['this field is required', 'not a valid email address', 'must be at least 4 character', 'must not excede 64 characters']}
               /><br/>
@@ -130,14 +129,14 @@ class SignUp extends React.Component {
                 name="repeatPassword"
                 id="repeatPassword"
                 type="password"
-                value={formData.repeatPassword}
+                // value={formData.repeatPassword}
                 validators={['required', 'isPasswordMatch']}
                 errorMessages={['this field is required', 'must match previous field']}
               /><br/>
               <TextValidator
                 floatingLabelText="Avatar URL (Optional)"
                 // onChange={this.handleInputChanges.bind(this)}
-                value={formData.avatarUrl}
+                // value={formData.avatarUrl}
                 name="avatarUrl"
                 id="avatarUrl"
               /><br/>
@@ -172,7 +171,7 @@ const mapStateToProps = state => {
     isLoggedIn: state.isLoggedIn,      
     submitted: state.submitted,
     didSignupFail: state.didSignupFail,
-    errorCode: state.errorCode 
+    errorCode: state.errorCode,
     actionLogUserIn,
     actionGetUserInfo,
     actionSignUp
