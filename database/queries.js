@@ -20,11 +20,10 @@ module.exports = {
   myFeed: feed.myFeed,
   profileFeed: feed.profileFeed,
   profileFeedRelational: feed.profileFeedRelational,
-<<<<<<< HEAD
+  updateRequest: feed.updateRequest,
+  deleteRequest: feed.deleteRequest,
+  
   reward: reward,
   insertToken: insertToken,
   findTokenByUser: findTokenByUser
-
-  updateRequest: feed.updateRequest,
-  deleteRequest: feed.deleteRequest
 }
