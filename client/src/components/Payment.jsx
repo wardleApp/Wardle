@@ -70,8 +70,7 @@ class Payment extends React.Component {
       amount: this.props.amount,
       note: this.props.note,
       private: this.props.private || false,
-      request: +this.props.amount < 0,
-      pending: +this.props.amount < 0
+      request: +this.props.amount < 0 ? 'pending' : undefined,
     };
     axios.post('/pay', payment)
       .then((response) => {
