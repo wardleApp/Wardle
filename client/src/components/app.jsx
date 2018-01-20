@@ -76,7 +76,7 @@ class App extends React.Component {
     let newFeedObject = isFeedEmpty
       ? transactionSummary
       : feedManipulation.mergeFeeds(transactionSummary, this.props[feedType]);
-    this.props.dispatch(actionPrependFeed({ feedType: feedType, obj: newFeedObject }))
+    this.props.dispatch('dispatch action here'({ feedType: feedType, obj: newFeedObject }))
 
   }
 
@@ -95,7 +95,7 @@ class App extends React.Component {
         // Confirm there additional items to load
         if (response.data && response.data.count > 0) {
           let combinedItems = feedManipulation.mergeFeeds(this.props[feedType], response.data);
-          this.props.dispatch(actionLoadMoreFeed({ feedType: feedType, obj: combinedItems }))
+          this.props.dispatch('dispatch action here'({ feedType: feedType, obj: combinedItems }))
         }
       })
       .catch((err) => {
@@ -106,7 +106,7 @@ class App extends React.Component {
   getBalance(userId) {
     axios('/balance', {params: {userId: userId}})
       .then((response) => {
-        this.props.dispatch(actionBalance(response.data.amount))
+        this.props.dispatch('dispatch action here'(response.data.amount))
       })
       .catch((err) =>{
         console.error(err);
@@ -116,7 +116,7 @@ class App extends React.Component {
   getUserInfo(userId) {
     axios('/profile', {params: {userId: userId}})
       .then((response) => {
-          this.props.dispatch(actionUserInfo(response.data))
+          this.props.dispatch('dispatch action here'(response.data))
       })
       .catch((err) =>{
         console.error(err);
@@ -127,7 +127,7 @@ class App extends React.Component {
     axios('/friends', { params: { userId: userId } })
       .then((response) => {
         console.log('response', response.data)
-        this.props.dispatch(getFriends(response.data));
+        this.props.dispatch('dispatch action here' response.data));
       })
       .catch((err) => {
         console.error(err);
@@ -138,7 +138,7 @@ class App extends React.Component {
      // set the userId in the userInfo object as soon as the user logs in
      var obj = this.props.userInfo;
      obj.userId = userId;
-     this.props.dispatch(actionLogIn(obj));
+     this.props.dispatch('dispatch action here' (obj));
      this.loadUserData(userId);
    }
 
@@ -219,13 +219,6 @@ const mapStateToProps = state => {
     isLoggedIn: state.isLoggedIn,
     globalFeed: state.globalFeed,
     userFeed: state.userFeed,
-    actionLogOut,
-    actionLogIn,
-    getFriends,
-    actionBalance,
-    actionUserInfo,
-    actionPrependFeed,
-    actionLoadMoreFeed
   };
 }
 
