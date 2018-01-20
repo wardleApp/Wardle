@@ -5,14 +5,9 @@ import Avatar from 'material-ui/Avatar';
 import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
 import axios from 'axios';
+import {connect} from 'react-redux';
 
 class Requests extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = {
-      open: false
-    }
-  }
 
   handleAccept() {
     let payment = {
@@ -21,13 +16,13 @@ class Requests extends React.Component {
       amount: this.props.request.amount.replace('-', ''),
       note: this.props.request.note,
       private: this.props.request.private,
-      request: false,
-      pending: false
+      request: 'completed'
     };
     axios.post('/pay', payment).then(response => {
       this.props.refreshUserData(this.props.request.payee.userId);
+      this.props.getHistory(this.props.request.payee.userId);
     });
-    this.handleDecline();
+
   }
 
   handleDecline() {
@@ -107,4 +102,6 @@ class Requests extends React.Component {
     );
   }
 }
-export default Requests;
+
+
+export default connect(mapStateToProps)(Requests);

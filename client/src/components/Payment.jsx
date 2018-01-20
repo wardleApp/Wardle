@@ -9,7 +9,12 @@ import Checkbox from 'material-ui/Checkbox';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 import {connect} from 'react-redux';
-import {actions} from 'actions';
+import {paymentGetUsernames,
+        paymentInputOnChange,
+        paymentDropDown,
+        paymentTogglePrivate,
+        paymentPayUser,
+        paymentError} from '../actions/paymentActions.js';
 
 const style = {
   form: {
@@ -31,22 +36,10 @@ const style = {
 }
 
 class Payment extends React.Component {
-  // constructor (props) {
-  //   super(props);
-  //   this.state = {
-  //     payeeUsername: '',
-  //     amount: '',
-  //     note: '',
-  //     paymentFail: false,
-  //     usernames: [],
-  //     private: false
-  //   }
-  // }
-
   componentDidMount() {
     axios('/usernames', { params: { userId: this.props.userInfo.payerId }})
     .then(response => {
-      this.props.dispatch(action(response.data.usernames));
+      this.props.dispatch(paymentGetUsernames(response.data.usernames));
     })
     .catch(err => {
       console.error(err);
@@ -59,15 +52,15 @@ class Payment extends React.Component {
       name: target.name,
       value: target.value
     }
-    this.props.dispatch(action2(obj));
+    this.props.dispatch(paymentInputOnChange(obj));
   }
 
   onDropdownInput(searchText) {
-    this.props.dispatch(action3(searchText));
+    this.props.dispatch(paymentDropDown(searchText));
   }
 
   setPrivate () {
-    this.props.dispatch(privateaction());
+    this.props.dispatch(paymentTogglePrivate());
   }
 
   payUser() {
@@ -76,13 +69,13 @@ class Payment extends React.Component {
       payeeUsername: this.props.payeeUsername,
       amount: this.props.amount,
       note: this.props.note,
-      private: this.props.private,
+      private: this.props.private || false,
       request: +this.props.amount < 0,
       pending: +this.props.amount < 0
     };
     axios.post('/pay', payment)
       .then((response) => {
-        this.props.dispatch(action4());
+        this.props.dispatch(paymentPayUser());
         this.props.refreshUserData(this.props.userInfo.payerId);
         this.props.getHistory(this.props.userInfo.payerId);
       })
@@ -106,11 +99,9 @@ class Payment extends React.Component {
         } else {
           console.error('Error in payment component:', error);
         }
-        this.props.dispatch(action5());
+        this.props.dispatch(paymentError());
         });
-      })
-  }
-
+      }
   render() {
     return (
       <Paper className='payment-container' style={style.form}>
@@ -183,10 +174,17 @@ const mapStateToProps = (state) => {
     note: state.note,
     amount: state.amount,
     paymentFail: state.paymentFail,
-    private: state.private,
-    action 1 to 5,
-    privateaction
+    private: state.private
   }
 };
 
-export default connect(mapStateToProps)(Payment);
+const mapDispatchToProps = {
+  paymentGetUsernames,
+  paymentInputOnChange,
+  paymentDropDown,
+  paymentTogglePrivate,
+  paymentPayUser,
+  paymentError
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Payment);

@@ -178,7 +178,7 @@ module.exports = {
     return pg('transactions')
     .where('txn_id', '=', id)
     .update({
-      pending: false
+      request: 'declined'
     }).then(result => {
       return result;
     });
@@ -186,8 +186,10 @@ module.exports = {
   deleteRequest: (id) => {
     return pg('transactions')
     .where('txn_id', '=', id)
-    .del().then(results => {
-      return results;
-    })
+    .update({
+      request: undefined
+    }).then(result => {
+      return result;
+    });
   }
 };

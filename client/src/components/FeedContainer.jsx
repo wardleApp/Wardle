@@ -5,16 +5,9 @@ import Avatar from 'material-ui/Avatar';
 import Paper from 'material-ui/Paper';
 import Dialog from 'material-ui/Dialog';
 import {connect} from 'react-redux';
+import toggleHistory from '../actions/toggleHistory.js';
 
 const FeedContainer = (props) => {
-
-handleOpen () {
-  this.setState({open: true});
-};
-
-handleClose () {
-  this.setState({open: false});
-};
 
   let buttons = [];
   let feedComponent;
@@ -56,14 +49,14 @@ handleClose () {
     <Paper className='feed-container'>
       <div className='feed-selections'>
         {buttons}
-        <button className='feed-buttons history' onClick={this.handleOpen.bind(this)} >
+        <button className='feed-buttons history' onClick={() => this.props.onClick()} >
           EXPORT
         </button>
         <Dialog
           title="Payment history"
           modal={false}
-          open={this.props.open}
-          onRequestClose={this.handleClose.bind(this)}
+          open={this.props.openHistory}
+          onRequestClose={() => this.props.onClick()}
           autoScrollBodyContent={true}
         >
           {props.history}
@@ -83,4 +76,7 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(FeedContainer);
+const mapDispatchToProps = {
+  onClick: toggleHistory
+};
+export default connect(mapStateToProps, mapDispatchToProps)(FeedContainer);
