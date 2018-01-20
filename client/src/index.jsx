@@ -1,46 +1,16 @@
 import React from 'react';
-import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-// import configureStore from './store/configureStore.jsx';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom'
-import LoggedOutHome from './components/LoggedOutHome.jsx';
-import Home from './components/Home.jsx';
-import Login from './components/Login.jsx';
 import reducer from './reducers/index.jsx';
 import { createStore } from 'redux';
-// // ---------- Material UI ---------- //
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import App from './components/app.jsx';
+
 
 const store = createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
-const muiTheme = getMuiTheme({
-  palette: {
-    primary1Color: '#3D95CE',
-  },
-});
-
-
 render (
   <Provider store={store} >
-    <MuiThemeProvider muiTheme={muiTheme}>
-    <BrowserRouter>
-      <Switch>
-        <Route 
-          path="/signup" 
-          // render={routeProps => <SignUp {...routeProps} logUserIn={this.logUserIn.bind(this)} />} 
-        />
-        <Route 
-          path="/login" 
-          render={routeProps => <Login />}
-        />
-        <Route 
-          path="/" 
-          render={routeProps => <LoggedOutHome />}
-        />
-      </Switch>
-    </BrowserRouter>
-  </MuiThemeProvider>
+    <App />
   </Provider>, 
   document.getElementById('app')
 );
