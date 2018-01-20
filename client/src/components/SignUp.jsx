@@ -5,12 +5,13 @@ import NavBar from './Navbar.jsx';
 import FlatButton from 'material-ui/FlatButton';
 import { ValidatorForm } from 'react-form-validator-core';
 import { TextValidator} from 'react-material-ui-form-validator';
+import { actionSignUpAuthError, actionSignUpComponentError, actionSignUpSubmitted } from '../actions/actionSignUp.jsx';
+import { reducerSignIn } from '../reducers/reducerSignIn.jsx'
 
 class SignUp extends React.Component {
   constructor (props) {
     super(props);
   }
-
 
   signUserUp() {
     this.props.dispatch(actionSignUpSubmitted);// Will have to write a dispatch for this
@@ -48,7 +49,7 @@ class SignUp extends React.Component {
   componentWillMount() {
       // custom rule will have name 'isPasswordMatch'
     ValidatorForm.addValidationRule('isPasswordMatch', (value) => {
-      if (value !== this.state.formData.password) {
+      if (value !== this.props.formData.password) {
           return false;
       }
       return true;
@@ -57,7 +58,7 @@ class SignUp extends React.Component {
 
   render() {
 
-    const { formData, submitted } = this.state;
+    const { formData, submitted } = this.props;
     return (
       <div>
         <NavBar isLoggedIn={false} />
@@ -142,9 +143,9 @@ class SignUp extends React.Component {
               /><br/>
             <div>
               <button className='btn' onClick={this.signUserUp.bind(this)}>Create Account</button>
-              {this.state.didSignupFail && 
+              {this.props.didSignupFail && 
                 <span className="error-text">
-                  {this.state.errorCode === 422
+                  {this.props.errorCode === 422
                     ? <span>Username, Phone Number, or Email is not unique. Please try again.</span>
                     : <span>Our servers are having issues. Please try later</span>
                   }

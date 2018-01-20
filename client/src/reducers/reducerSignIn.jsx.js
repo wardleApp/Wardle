@@ -1,4 +1,4 @@
-export function reducerGetBalance(
+export function reducerSignIn(
   state = {       
       submitted: false,
       didSignupFail: false,
