@@ -1,14 +1,15 @@
 // ---------- Packages ---------- //
 import React from 'react';
 import { withRouter, Link } from "react-router-dom";
-import AppBar from 'material-ui/AppBar';
-import FlatButton from 'material-ui/FlatButton';
 
 // ---------- React-Redux ---------- //
 import { connect } from 'react-redux';
-import { paymo } from './Reducers';
+import { combineReducers } from '../reducers/rootReducer.jsx';
 import { actionLogUserOut } from '../actions/actionLogUserOut.jsx';
 
+// ---------- Material UI ---------- //
+import AppBar from 'material-ui/AppBar';
+import FlatButton from 'material-ui/FlatButton';
 
 const style = {
   nav: { background: '#3D95CE', display: 'flex'},
@@ -64,7 +65,7 @@ function mapStateToProps(state) {
     balance: state.balance,
     userInfo: state.userInfo,
     userFeed: state.userFeed,
-    actionLogOut
+    actionLogUserOut
   }
 }
 

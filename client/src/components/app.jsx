@@ -7,25 +7,28 @@ import axios from 'axios';
 
 // ---------- React-Redux ---------- //
 import { connect } from 'react-redux';
-import actionLogUserIn from '../actions/actionLogUserIn.jsx';
-import actionLogUserOut from '../actions/actionLogUserOut.jsx';
-import actionSetInitialFeed from '../actions/actionSetInitialFeed.jsx';
-import actionGetBalance from '../actions/actionGetBalance.jsx';
-import actionGetUserInfo from '../actions/actionGetUserInfo.jsx';
-import actionLoadMoreFeed from '../actions/actionLoadMoreFeed.jsx';
+import { actionLogUserIn } from '../actions/actionLogUserIn.jsx';
+import { actionLogUserOut } from '../actions/actionLogUserOut.jsx';
+import { actionLoginFailed } from '../actions/actionLoadMoreFeed.jsx';
+import { actionSetInitialFeed } from '../actions/actionSetInitialFeed.jsx';
+import { actionGetBalance } from '../actions/actionGetBalance.jsx';
+import { actionGetUserInfo } from '../actions/actionGetUserInfo.jsx';
+import { actionLoadMoreFeed } from '../actions/actionLoadMoreFeed.jsx';
+import { actionInitialStates } from '../actions/actionInitialStates.jsx';
 
 // ---------- Material UI ---------- //
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
-// ---------- Componenents ---------- //
-import LoggedOutHome from './components/LoggedOutHome.jsx';
-import Home from './components/Home.jsx';
-import Profile from './components/Profile.jsx';
-import Navbar from './components/Navbar.jsx';
+// ---------- Components ---------- //
+import Login from './Login.jsx';
+import LoggedOutHome from './LoggedOutHome.jsx';
+import Home from './Home.jsx';
+import Profile from './Profile.jsx';
+import Navbar from './Navbar.jsx';
 
 // ---------- Helper ---------- //
-import feedManipulation from './feedManipulation.js'
+import feedManipulation from '../feedManipulation.js'
 
 const muiTheme = getMuiTheme({
   palette: {
@@ -43,14 +46,12 @@ class App extends React.Component {
     this.getBalance(userId);
     this.getFeed('globalFeed', userId);
     this.getFeed('userFeed', userId);
-    this.getFriendsList(userId);
   }
 
   refreshUserData(userId) {
     this.getBalance(userId);
     this.getFeed('globalFeed', userId, this.props.globalFeed.newestTransactionId || null);
     this.getFeed('userFeed', userId, this.props.userFeed.newestTransactionId || null);
-    this.getFriendsList(userId);
   }
 
   getFeed(feedType, userId = null, sinceId) {
@@ -64,6 +65,7 @@ class App extends React.Component {
     axios(endpoint, {params: params})
       .then((response) => {
         this.prependNewTransactions(feedType, response.data);
+
       })
       .catch((err) => {
         console.error(err);
@@ -130,7 +132,7 @@ class App extends React.Component {
 
   logUserIn(userId) {
      // set the userId in the userInfo object as soon as the user logs in
-     var obj = this.props.userInfo;
+     var obj = this.props.userInfo || {};
      obj.userId = userId;
      this.props.dispatch(actionLogUserIn(obj));
      this.loadUserData(userId);
@@ -223,10 +225,12 @@ const mapStateToProps = state => {
     userFeed: state.userFeed,
     actionLogUserIn,
     actionLogUserOut,
+    actionLoginFailed,
     actionSetInitialFeed,
     actionGetBalance,
     actionGetUserInfo,
-    actionLoadMoreFeed
+    actionLoadMoreFeed,
+    actionInitialStates
   };
 }
 

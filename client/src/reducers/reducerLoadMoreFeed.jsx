@@ -1,4 +1,4 @@
-export function reducerLoginAttempt(state = { globalFeed: {}, userFeed: {} },  action) {
+export function reducerLoadMoreFeed(state = { globalFeed: {}, userFeed: {} },  action) {
   switch (action.type) {
     case 'LOAD_MORE_FEED': 
       return Object.assign({}, state, {
