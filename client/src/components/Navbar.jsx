@@ -1,29 +1,24 @@
+// ---------- Packages ---------- //
 import React from 'react';
 import { withRouter, Link } from "react-router-dom";
 import AppBar from 'material-ui/AppBar';
 import FlatButton from 'material-ui/FlatButton';
 
+// ---------- React-Redux ---------- //
+import { connect } from 'react-redux';
+import { paymo } from './Reducers';
+import { actionLogUserOut } from '../actions/actionLogUserOut.jsx';
+
+
 const style = {
-  nav: {
-    background: '#3D95CE',
-    display: 'flex',
-  },
-  left: {
-    display: 'none',
-  },
-  log_out: {
-    color: '#fff',
-    textDecoration: 'underline',
-  }
+  nav: { background: '#3D95CE', display: 'flex'},
+  left: { display: 'none' },
+  log_out: { color: '#fff', textDecoration: 'underline'}
 };
 
 class Navbar extends React.Component {
   constructor (props) {
     super(props);
-
-    this.state = {
-      isLoggedIn: this.props.isLoggedIn
-    }
   }
 
   logOutAndRedirect () {
@@ -61,4 +56,16 @@ class Navbar extends React.Component {
   }
 }
 
-export default withRouter(Navbar);
+function mapStateToProps(state) {
+
+  return {
+    isLoggedIn: state.isLoggedIn,
+    globalFeed: state.globalFeed,
+    balance: state.balance,
+    userInfo: state.userInfo,
+    userFeed: state.userFeed,
+    actionLogOut
+  }
+}
+
+export default withRouter(connect(mapStateToProps)(Navbar));
