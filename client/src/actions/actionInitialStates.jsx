@@ -1,12 +1,11 @@
-export function actionLogUserIn(userId) {
+export function actionInitialStates() {
 	return { 
-		type: 'LOG_USER_IN', 
-		payload: userId
+		type: 'INITIALISE_STATES'
 	}
 }
 
 /* Description: This action gets "dispatched" and then triggers its respective reducer
-to log the user in.
+to set the initial global states.
 */
 
 /*---------- DONE ----------*/

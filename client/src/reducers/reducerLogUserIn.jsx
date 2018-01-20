@@ -1,13 +1,12 @@
-export function reducerLoginAttempt(state = { loginMessage: '', isLoggedIn: false, userInfo: {} },  action) {
+export function reducerLogUserIn(state = { errorMessage: '', isLoggedIn: false, userInfo: {} },  action) {
   switch (action.type) {
-    case 'DATABASE_ERROR': 
+    case 'LOGIN_ERROR': 
       return Object.assign({}, state, {
-      	loginMessage: 'Error' 
+      	errorMessage: 'Error' 
       })
-    case 'LOGIN_USER_IN': 
+    case 'LOG_USER_IN': 
       return Object.assign({}, state, {
-      	isLoggedIn: true,
-        userInfo: action.payload
+      	isLoggedIn: true
       })
     default: 
       return state;

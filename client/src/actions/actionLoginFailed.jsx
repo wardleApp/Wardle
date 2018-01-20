@@ -1,12 +1,11 @@
-export function actionLogUserIn(userId) {
+export function actionLoginFailed() {
 	return { 
-		type: 'LOG_USER_IN', 
-		payload: userId
+		type: 'LOGIN_ERROR'
 	}
 }
 
 /* Description: This action gets "dispatched" and then triggers its respective reducer
-to log the user in.
+to error the user login state.
 */
 
 /*---------- DONE ----------*/

@@ -10,7 +10,8 @@ class LoggedOutHome extends React.Component {
   render() {
     return (
       <div>
-
+      <Navbar 
+        logUserOut={this.props.logUserOut} />
         <div className='body-container'>
           <div className='splash' >
             <div className='splash-images'>
@@ -33,8 +34,22 @@ class LoggedOutHome extends React.Component {
   }
 }
 
-export default LoggedOutHome;
+const mapStateToProps = state => {
+  return {
+    balance: state.balance,
+    userInfo: state.userInfo,
+    isLoggedIn: state.isLoggedIn,
+    globalFeed: state.globalFeed,
+    userFeed: state.userFeed,
+    actionLogUserIn,
+    actionLogUserOut,
+    actionLoginFailed,
+    actionSetInitialFeed,
+    actionGetBalance,
+    actionGetUserInfo,
+    actionLoadMoreFeed,
+    actionInitialStates
+  };
+}
 
-        // <Navbar 
-        //   isLoggedIn={this.props.isLoggedIn} 
-        //   logUserOut={this.props.logUserOut} />
+export default LoggedOutHome;

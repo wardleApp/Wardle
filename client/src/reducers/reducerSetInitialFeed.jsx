@@ -1,4 +1,4 @@
-export function reducerLoginAttempt(state = { globalFeed: {}, userFeed: {} },  action) {
+export function reducerSetInitialFeed(state = { globalFeed: {}, userFeed: {} },  action) {
   switch (action.type) {
     case 'SET_INITIAL_FEED': 
       return Object.assign({}, state, {
