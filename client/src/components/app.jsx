@@ -7,7 +7,12 @@ import axios from 'axios';
 
 // ---------- React-Redux ---------- //
 import { connect } from 'react-redux';
-import Actions from './actions/loginAttempt.jsx'
+import actionLogUserIn from '../actions/actionLogUserIn.jsx';
+import actionLogUserOut from '../actions/actionLogUserOut.jsx';
+import actionSetInitialFeed from '../actions/actionSetInitialFeed.jsx';
+import actionGetBalance from '../actions/actionGetBalance.jsx';
+import actionGetUserInfo from '../actions/actionGetUserInfo.jsx';
+import actionLoadMoreFeed from '../actions/actionLoadMoreFeed.jsx';
 
 // ---------- Material UI ---------- //
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -18,6 +23,7 @@ import LoggedOutHome from './components/LoggedOutHome.jsx';
 import Home from './components/Home.jsx';
 import Profile from './components/Profile.jsx';
 import Navbar from './components/Navbar.jsx';
+
 // ---------- Helper ---------- //
 import feedManipulation from './feedManipulation.js'
 
@@ -76,8 +82,7 @@ class App extends React.Component {
     let newFeedObject = isFeedEmpty
       ? transactionSummary
       : feedManipulation.mergeFeeds(transactionSummary, this.props[feedType]);
-    this.props.dispatch('dispatch action here'({ feedType: feedType, obj: newFeedObject }))
-
+    this.props.dispatch(actionSetInitialFeed({ feedType: feedType, obj: newFeedObject }))
   }
 
   loadMoreFeed(feedType, userId) {
@@ -95,7 +100,7 @@ class App extends React.Component {
         // Confirm there additional items to load
         if (response.data && response.data.count > 0) {
           let combinedItems = feedManipulation.mergeFeeds(this.props[feedType], response.data);
-          this.props.dispatch('dispatch action here'({ feedType: feedType, obj: combinedItems }))
+          this.props.dispatch(actionLoadMoreFeed({ feedType: feedType, obj: combinedItems }))
         }
       })
       .catch((err) => {
@@ -106,7 +111,7 @@ class App extends React.Component {
   getBalance(userId) {
     axios('/balance', {params: {userId: userId}})
       .then((response) => {
-        this.props.dispatch('dispatch action here'(response.data.amount))
+        this.props.dispatch(actionGetBalance(response.data.amount))
       })
       .catch((err) =>{
         console.error(err);
@@ -116,20 +121,9 @@ class App extends React.Component {
   getUserInfo(userId) {
     axios('/profile', {params: {userId: userId}})
       .then((response) => {
-          this.props.dispatch('dispatch action here'(response.data))
+          this.props.dispatch(actionGetUserInfo(response.data))
       })
       .catch((err) =>{
-        console.error(err);
-      });
-  }
-
-  getFriendsList(userId) {
-    axios('/friends', { params: { userId: userId } })
-      .then((response) => {
-        console.log('response', response.data)
-        this.props.dispatch('dispatch action here' response.data));
-      })
-      .catch((err) => {
         console.error(err);
       });
   }
@@ -138,9 +132,13 @@ class App extends React.Component {
      // set the userId in the userInfo object as soon as the user logs in
      var obj = this.props.userInfo;
      obj.userId = userId;
-     this.props.dispatch('dispatch action here' (obj));
+     this.props.dispatch(actionLogUserIn(obj));
      this.loadUserData(userId);
    }
+
+   logUserOut() {
+    this.props.dispatch(actionLogUserOut(obj));
+  }
 
 
   render () {
@@ -155,7 +153,7 @@ class App extends React.Component {
             : 
             <Home
               refreshUserData={this.refreshUserData.bind(this)}
-              // logUserOut={this.logUserOut.bind(this)}
+              logUserOut={this.logUserOut.bind(this)}
               loadMoreFeed={this.loadMoreFeed.bind(this)}
               {...props}
               />
@@ -178,9 +176,8 @@ class App extends React.Component {
                 key={routeProps.location.pathname}
                 refreshUserData={this.refreshUserData.bind(this)}
                 isLoggedIn={this.props.isLoggedIn} 
-                // logUserOut={this.logUserOut.bind(this)}
-                // isLoggedIn={this.props.isLoggedIn} 
-                // logUserOut={this.logUserOut.bind(this)}
+                logUserOut={this.logUserOut.bind(this)}
+                isLoggedIn={this.props.isLoggedIn} 
                 userInfo={this.props.userInfo}
                 {...routeProps}
               />
@@ -193,6 +190,14 @@ class App extends React.Component {
       <MuiThemeProvider muiTheme={muiTheme}>
         <BrowserRouter>
           <Switch>
+            <Route 
+              exact path="/signup" 
+              render={routeProps => <SignUp {...routeProps} logUserIn={this.logUserIn.bind(this)} />} 
+            />
+            <Route 
+              exact path="/login" 
+              render={routeProps => <Login {...routeProps} logUserIn={this.logUserIn.bind(this)} />} 
+            />
             <Route 
               path="/:username"
               onEnter={ this.requireAuth }
@@ -209,9 +214,6 @@ class App extends React.Component {
   }
 }
 
-
-
-
 const mapStateToProps = state => {
   return {
     balance: state.balance,
@@ -219,9 +221,13 @@ const mapStateToProps = state => {
     isLoggedIn: state.isLoggedIn,
     globalFeed: state.globalFeed,
     userFeed: state.userFeed,
+    actionLogUserIn,
+    actionLogUserOut,
+    actionSetInitialFeed,
+    actionGetBalance,
+    actionGetUserInfo,
+    actionLoadMoreFeed
   };
 }
-
-
 
 export default connect(mapStateToProps)(App);
