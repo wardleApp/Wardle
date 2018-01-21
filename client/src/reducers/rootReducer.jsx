@@ -6,15 +6,17 @@ import { reducerLoadMoreFeed } from './reducerLoadMoreFeed.jsx';
 import { reducerLogUserIn } from './reducerLogUserIn.jsx';
 import { reducerLogUserOut } from './reducerLogUserOut.jsx';
 import { reducerSetInitialFeed } from './reducerSetInitialFeed.jsx';
+import { reducerSignIn } from './reducerSignIn.jsx';
 
 export default combineReducers({
-    reducerGetBalance,
-    reducerGetUserInfo,
-    reducerLoadMoreFeed,
-    reducerLogUserIn,
-    reducerLogUserOut,
-    reducerSetInitialFeed,
-    reducerInitialStates
+  reducerGetBalance,
+  reducerGetUserInfo,
+  reducerLoadMoreFeed,
+  reducerLogUserIn,
+  reducerLogUserOut,
+  reducerSetInitialFeed,
+  reducerInitialStates, 
+  reducerSignIn
 });
 
 /* Description: This file will combine all our smaller reducing functions 

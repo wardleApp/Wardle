@@ -24,6 +24,7 @@ const style = {
   }
 };
 
+
 class MiniProfile extends React.Component {
   constructor (props) {
     super(props);
