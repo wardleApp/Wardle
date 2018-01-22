@@ -10,6 +10,9 @@ const morgan = require('morgan');
 var path = require('path');
 const _ = require('underscore');
 
+//source api key from .env file
+require('dotenv').config();
+
 /* Dillon Experimental Routes */
 const dillonRoutes = require('./dillonRoutes.js');
 const index = require('./index.js');
@@ -439,9 +442,6 @@ app.get('/feed/relational', (req, res) => {
 
 //for sending emails
 const sgMail = require('@sendgrid/mail');
-
-//source api key from .env file
-require('dotenv').config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
