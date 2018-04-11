@@ -4,13 +4,16 @@
 
 ## Team
   [Derrick Cross] (https://github.com/decross1)
+  
   [Dillon Lim] (https://github.com/DillonLin)
+  
   [Jackie Jou] (https://github.com/jackiejou)
+  
   [Nuno Neves] (https://github.com/storycoding)
 
 ## Table of Contents
 1. [Requirements](#requirements)
-2. [Installation](#Installing Dependencies)
+2. [Installation](https://github.com/wardleApp/Wardle/blob/master/README.md#installing-dependencies)
 3. [Contributing](#contributing)
 
 ## Requirements
