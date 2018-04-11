@@ -21,7 +21,7 @@
 - Redis 2.6.x
 - Postgresql 9.1.x
 
-### Installing Dependencies
+## Installing Dependencies
 From within the root directory:
 
 ```sh
