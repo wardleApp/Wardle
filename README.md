@@ -1,3 +1,8 @@
+<img src="https://github.com/wardleApp/Wardle/blob/master/wardleApp_150x150px.png?raw=true" />
+
+
+
+
 # Wardle
 
 > peer-to-peer mobile payment made easy
